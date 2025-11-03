@@ -1,0 +1,159 @@
+CREATE TABLE doc_etudiant (
+   id_docet INT PRIMARY KEY,
+   nom_ass_sco VARCHAR(100),
+   n_ass_sco VARCHAR(50),
+   adresse_ass_sco VARCHAR(150),
+   last_vacc DATE,
+   nom_doc VARCHAR(100),
+   adresse_doc VARCHAR(150),
+   tel_doc VARCHAR(20),
+   n_secu_social VARCHAR(20)
+);
+
+CREATE TABLE utilisateur (
+   identifiant VARCHAR(50) PRIMARY KEY,
+   mot_de_passe VARCHAR(100) -- Prévoir de stocker des mots de passe hashés
+);
+
+CREATE TABLE anne_sco (
+   annee DATE PRIMARY KEY
+);
+
+CREATE TABLE scolarite (
+   id_scolar VARCHAR(50) PRIMARY KEY,
+   classe VARCHAR(50),
+   lv1 VARCHAR(50),
+   lv2 VARCHAR(50),
+   etablissement VARCHAR(100),
+   option VARCHAR(50),
+   filiere VARCHAR(100),
+   annee DATE NOT NULL,
+   FOREIGN KEY (annee) REFERENCES anne_sco(annee)
+);
+
+CREATE TABLE transport (
+   id_transport VARCHAR(50) PRIMARY KEY,
+   vehicule VARCHAR(50),
+   p_dimmatriculation VARCHAR(20)
+);
+
+CREATE TABLE adresse (
+   id_adresse VARCHAR(50) PRIMARY KEY,
+   rue VARCHAR(100),
+   ville VARCHAR(50),
+   commune VARCHAR(50),
+   departement VARCHAR(50)
+);
+
+CREATE TABLE doss_sco (
+   id_sco INT PRIMARY KEY,
+   regime_sco VARCHAR(50),
+   specialite VARCHAR(50),
+   id_scolar VARCHAR(50) NOT NULL,
+   FOREIGN KEY (id_scolar) REFERENCES scolarite(id_scolar)
+);
+
+CREATE TABLE responsable_legal (
+   id_respleg INT PRIMARY KEY,
+   nom VARCHAR(100),
+   prenom VARCHAR(100),
+   profession VARCHAR(100),
+   tel VARCHAR(20),
+   cp VARCHAR(10),
+   email VARCHAR(100),
+   nom_emp VARCHAR(100),
+   adresse_emp VARCHAR(150),
+   id_adresse VARCHAR(50) NOT NULL,
+   FOREIGN KEY (id_adresse) REFERENCES adresse(id_adresse)
+);
+
+CREATE TABLE admi (
+   identifiant VARCHAR(50),
+   mot_de_passe VARCHAR(100),
+   PRIMARY KEY (identifiant),
+   FOREIGN KEY (identifiant) REFERENCES utilisateur(identifiant)
+);
+
+CREATE TABLE etudiant (
+   id_etudiant INT PRIMARY KEY,
+   nom VARCHAR(100),
+   prenom VARCHAR(100),
+   tel VARCHAR(20),
+   email VARCHAR(100),
+   date_naissance DATE,
+   sexe BOOLEAN,
+   adresse_medicale VARCHAR(150),
+   diplome VARCHAR(100),
+   id_adresse VARCHAR(50) NOT NULL,
+   id_transport VARCHAR(50) NOT NULL,
+   id_docet INT NOT NULL,
+   id_sco INT NOT NULL,
+   id_respleg INT NOT NULL,
+   identifiant VARCHAR(50) NOT NULL,
+   mot_de_passe VARCHAR(50) NOT NULL,
+   FOREIGN KEY (id_adresse) REFERENCES adresse(id_adresse),
+   FOREIGN KEY (id_transport) REFERENCES transport(id_transport),
+   FOREIGN KEY (id_docet) REFERENCES doc_etudiant(id_docet),
+   FOREIGN KEY (id_sco) REFERENCES doss_sco(id_sco),
+   FOREIGN KEY (id_respleg) REFERENCES responsable_legal(id_respleg),
+   FOREIGN KEY (identifiant) REFERENCES utilisateur(identifiant),
+   UNIQUE (identifiant),
+   FOREIGN KEY (mot_de_passe) REFERENCES utilisateur(mot_de_passe),
+   UNIQUE (mot_de_passe)
+);
+ALTER TABLE etudiant
+ADD fmot_de_passe VARCHAR(100) FOREIGN KEY (mot_de_passe) REFERENCES utilisateur(mot_de_passe),
+   UNIQUE (mot_de_passe);
+####################################################INSERT###############################################
+
+-- 1. Année scolaire
+INSERT INTO anne_sco (annee) VALUES ('2023-09-01');
+
+-- 2. Utilisateur
+INSERT INTO utilisateur (identifiant, mot_de_passe) VALUES
+('will', 'will123'),
+('bob', 'azerty456');
+
+-- 3. Administrateur
+INSERT INTO admi (identifiant, mot_de_passe) VALUES
+('will', 'will123');
+
+-- 4. Adresses
+INSERT INTO adresse (id_adresse, rue, ville, commune, departement) VALUES
+('A001', '10 rue de Paris', 'chartres', 'Chartres', 'Eure-et-Loir'),
+('A002', '25 avenue Victor Hugo', 'Marseille', 'Marseille', 'Bouches-du-Rhône');
+
+-- 5. Transport
+INSERT INTO transport (id_transport, vehicule, p_dimmatriculation) VALUES
+('T001', 'Bus', 'AB-123-CD'),
+('T002', 'Voiture', 'EF-456-GH');
+
+-- 6. Documents médicaux
+INSERT INTO doc_etudiant (id_docet, nom_ass_sco, n_ass_sco, adresse_ass_sco, last_vacc, nom_doc, adresse_doc, tel_doc, n_secu_social) VALUES
+(1, 'MAIF', '123456789', '5 rue Santé, Lyon', '2023-01-15', 'Dr. Martin', '8 rue des Lilas', '0600000000', '1234567890123'),
+(2, 'MGEN', '987654321', '12 avenue Santé, Marseille', '2023-02-20', 'Dr. Dupont', '3 place Hôpital', '0700000000', '9876543210987');
+
+-- 7. Scolarité
+INSERT INTO scolarite (id_scolar, classe, lv1, lv2, etablissement, option, annee) VALUES
+('S001', 'Terminale S', 'Anglais', 'Espagnol', 'Lycée Lumière', 'Maths', '2023-09-01'),
+('S002', '1ère STMG', 'Anglais', 'Allemand', 'Lycée Marseille', 'Gestion', '2023-09-01');
+
+-- 8. Dossier scolaire
+INSERT INTO doss_sco (id_sco, regime_sco, specialite, id_scolar) VALUES
+(1, 'Interne', 'Mathématiques', 'S001'),
+(2, 'Demi-pensionnaire', 'Économie', 'S002');
+
+-- 9. Responsable légal
+INSERT INTO responsable_legal (id_respleg, nom, prenom, profession, tel, cp, email, nom_emp, adresse_emp, id_adresse) VALUES
+(1, 'Durand', 'Marie', 'Infirmière', '0612345678', '69000', 'marie.durand@example.com', 'Hôpital Lyon Sud', '15 rue Hôpital, Lyon', 'A001'),
+(2, 'Bernard', 'Luc', 'Comptable', '0623456789', '13000', 'luc.bernard@example.com', 'Cabinet Bernard', '20 rue Fiscal, Marseille', 'A002');
+
+-- 10. Étudiants
+INSERT INTO etudiant (
+   id_etudiant, nom, prenom, tel, email, date_naissance, sexe, adresse_medicale, diplome,
+   id_adresse, id_transport, id_docet, id_sco, id_respleg, identifiant, mot_de_passe
+) VALUES (
+   1, 'lebrico', 'bob', '06 95 28 36 24', 'bob.lebrico@example.com', '2005-05-20', TRUE, 'Centre Médical Lyon', 'Master',
+   'A001', 'T001', 1, 1, 1, 'bob', 'azerty456'
+);
+
