@@ -1,83 +1,105 @@
-# 🎓 EasyBTS - Lycée Fulbert (V1) : Documentation Technique
+# 📚 EasyBTS - Lycée Fulbert (V1) : Documentation Technique 
 
-## Application d'Inscription en BTS SIO (SLAM / SISR)
+## Guide d'Installation Point-Par-Point 
 
-Ce projet vise à **numériser** le processus de candidature au BTS SIO, offrant une plateforme sécurisée pour les étudiants et un outil de gestion efficace pour le secrétariat.
+Ce document est le guide de référence complet pour installer, configurer et lancer l'application EasyBTS, en fournissant toutes les étapes d'infrastructure et de code.
 
 -----
 
-## 1\. 🚀 Contexte Technique et Stack
+## 1\. 🔍 Contexte du Projet et Stack Technologique
 
-L'application est développée sous l'architecture **LAMP** (Linux, Apache/Nginx, MySQL/MariaDB, PHP) et utilise le framework Symfony pour structurer le code.
+### 1.1. Objectifs Fonctionnels
 
-### 1.1. Technologies Principales
+L'application EasyBTS est une plateforme web visant à dématérialiser le processus d'admission au BTS SIO.
 
-| Technologie | Version | Rôle dans le Projet |
+  * **Sécurité et Suivi** : Assurer l'intégrité des données et permettre le suivi précis du statut de chaque dossier (`en attente`, `validé`, `refusé`).
+  * **Accessibilité** : Offrir une interface conforme aux normes de l'État (via le DSFR) pour les candidats et le personnel administratif.
+  * **Efficacité** : Fournir des outils d'administration (filtration, export CSV) pour rationaliser le travail du secrétariat.
+
+### 1.2. Architecture Logicielle et Outils
+
+Le projet est basé sur une stack **Symfony** moderne, garantissant la robustesse et la maintenabilité.
+
+| Composant | Rôle Précis | Justification Technique |
 | :--- | :--- | :--- |
-| **PHP** | 8.1+ | Langage de programmation principal. |
-| **Symfony** | 6.x / 7.x | Framework backend (structure, routing, services). |
-| **Doctrine ORM** | -- | Gestion de la persistance des données (mapping Objet-Relationnel). |
-| **MySQL / MariaDB** | -- | Système de Gestion de Base de Données (SGBD). |
-| **Twig** | -- | Moteur de template pour l'affichage côté client (Vue). |
-| **Bootstrap** | 5.x | Framework CSS pour le design et le responsive. |
-
-### 1.2. Organisation du Code (Architecture MVC)
-
-Le code suit le modèle **MVC (Modèle-Vue-Contrôleur)**, ce qui garantit une séparation claire des responsabilités :
-
-  * **Contrôleur (`src/Controller`)** : Gère la logique de la requête HTTP, appelle le Modèle, et prépare la Vue (ex: `InscriptionController.php`).
-  * **Modèle (`src/Entity`, `src/Repository`)** : Représente les données (Entités Doctrine) et gère l'interaction avec la base de données.
-  * **Vue (`templates/`)** : Affiche les données grâce au moteur Twig (le HTML final).
+| **Backend** | **Symfony (PHP 8.1+)** | Fournit le routing, le conteneur de services et la structure MVC. |
+| **ORM** | **Doctrine** | Gère la persistance des données et le mappage Entité-Table, évitant le SQL natif. |
+| **SGBD** | **MySQL / MariaDB** | Stockage relationnel des données d'inscription. |
+| **Frontend** | **DSFR (npm)** | Assure la conformité graphique aux standards de l'administration française (accessibilité et identité). |
 
 -----
 
-## 2\. 🛡️ Modèle de Données et Sécurité
+## 2\. 🛡️ Modèle de Données et Sécurité Logique
 
-Le schéma de la base de données est structuré pour maximiser la cohérence et minimiser la redondance.
+### 2.1. Structure du Dossier (Entités Centrales)
 
-### 2.1. Structure du Dossier
+L'intégrité de chaque candidature repose sur l'entité centrale `Etudiant`.
 
-L'entité `Etudiant` est le cœur du système. Toutes les autres informations sont liées à celle-ci via des relations un-à-un (`OneToOne`), garantissant que chaque dossier est complet et unique.
+  * L'entité **`Etudiant`** est liée à toutes les informations annexes par des relations **One-to-One** (1:1), assurant qu'il n'y a qu'une seule adresse, un seul jeu de documents, et un seul compte utilisateur par candidat.
+  * L'utilisation des **Migrations Doctrine** garantit que la structure de la base de données est toujours synchronisée avec les classes **Entité** du code source.
 
-  * **`Etudiant`** : Détails du candidat (`nom`, `prenom`, `statut`, `date_naissance`).
-  * **`Utilisateur`** : Gestion de la connexion (`identifiant`, `mot_de_passe`, `role`). Relation un-à-un avec l'étudiant.
-  * **`DossierScolarite`** : Parcours académique antérieur (`regime_sco`, `specialite`).
-  * **`DocEtudiant`** : Liens vers les documents dématérialisés (`carte_vitale`, `diplome`, etc.).
+### 2.2. Gestion des Rôles et Authentification
 
-### 2.2. Gestion des Rôles
+La sécurité est gérée par le composant **Symfony Security**.
 
-Deux rôles principaux sont définis :
-
-  * `ROLE_USER` : Accès aux formulaires d'inscription et à la page de suivi de son propre dossier.
-  * `ROLE_ADMIN` : Accès au tableau de bord d'administration, filtration, validation/refus, et export des données.
-
-La vérification des accès est gérée par le composant **Symfony Security**.
+  * **`ROLE_USER`** : Rôle attribué aux candidats pour l'accès aux formulaires et au suivi de leur propre dossier.
+  * **`ROLE_ADMIN`** : Rôle attribué au personnel pour l'accès au tableau de bord de gestion et aux actions d'export/validation.
 
 -----
 
-## 3\. ⚙️ Guide d'Installation (Pas-à-Pas Détaillé)
+## 3\. 🛠️ Guide d'Installation Point-Par-Point (6 Étapes)
 
-Ce guide permet d'initialiser l'environnement de développement complet et de le peupler avec les données de test.
+Ce guide est un chemin d'exécution séquentiel, assumant que vous partez d'une machine de développement propre (hôte) avec les prérequis installés (Git, PHP, Composer, npm).
 
-### 3.1. Étape 1 : Préparation du Projet
+### 3.1. Étape 1 : Mise en Place de l'Infrastructure du Serveur BDD
 
-Assurez-vous d'avoir les outils prérequis (PHP 8.1+, Composer, Git) installés et configurés.
+Le serveur de base de données doit être créé et configuré pour être accessible depuis la machine hôte.
 
-| Commande | Description |
+#### 3.1.1. Choix et Initialisation du Serveur SGBD
+
+  * **Si VM (Virtual Machine)** : Créez une VM (ex: Ubuntu), installez le paquet `mysql-server` et assurez-vous que le **port 3306 est ouvert** et accessible depuis l'IP de votre machine hôte.
+  * **Si Docker (Recommandé en Dev)** : Lancez un conteneur MariaDB/MySQL.
+
+#### 3.1.2. Création de l'Utilisateur de l'Application
+
+Connectez-vous à la console MySQL de votre serveur BDD (VM/Docker) pour créer l'utilisateur qui sera utilisé par Symfony.
+
+| Commande MySQL | Objectif Précis |
 | :--- | :--- |
-| `git clone https://github.com/Wilou-36/Inscription easybts` | Télécharge le code source du projet. |
-| `cd easybts` | Se place dans le répertoire de travail. |
-| `composer install` | Installe toutes les dépendances PHP et initialise les fichiers d'autoload. |
+| `CREATE USER 'app'@'%' IDENTIFIED BY 'password_fort';` | Crée l'utilisateur **`app`** pour la connexion à distance. (`%` est l'hôte, utilisez l'IP de votre machine hôte si vous voulez restreindre l'accès). |
+| `GRANT ALL PRIVILEGES ON *.* TO 'app'@'%';` | Donne tous les droits nécessaires à Doctrine pour créer la base de données et manipuler toutes les tables. |
+| `FLUSH PRIVILEGES;` | Active les nouvelles permissions immédiatement. |
 
-### 3.2. Étape 2 : Configuration et Schéma de la Base de Données
+### 3.2. Étape 2 : Récupération du Code et Dépendances
 
-Nous utilisons l'outil Doctrine pour gérer la base de données.
+Ces commandes sont exécutées sur votre **machine hôte** (poste de développement).
 
-1.  **Configuration de la Connexion** : Ouvrez le fichier **`.env.local`** et définissez la chaîne de connexion `DATABASE_URL` pour pointer vers votre instance MySQL locale.
+| Action | Commande | Explication Détaillée |
+| :--- | :--- | :--- |
+| **Clonage du Dépôt** | `git clone https://github.com/Wilou-36/Inscription easybts` | **Clône le dépôt** du projet dans le dossier `easybts`. |
+| **Accès au Projet** | `cd easybts` | Se positionne dans le répertoire racine du projet. Toutes les commandes suivantes sont exécutées d'ici. |
+| **Dépendances PHP** | `composer install` | Lit le fichier `composer.lock` et télécharge précisément toutes les dépendances Backend (Symfony, Doctrine). |
+| **Dépendances Frontend** | `npm install @gouvfr/dsfr` | Installe le paquet du **Design System de l'État Français (DSFR)** pour les composants visuels. |
 
-    *Exemple :* `DATABASE_URL="mysql://root:motdepasse@127.0.0.1:3306/easybts_db"`
+### 3.3. Étape 3 : Configuration du Lien BDD et Schéma
 
-2.  **Création de la Base de Données** : Cette commande utilise la configuration du `.env` pour créer la base de données vide.
+Cette étape connecte le code au serveur BDD distant et crée la structure de la base de données.
+
+1.  **Configuration du Fichier `.env.local`** :
+
+      * Ouvrez le fichier **`.env.local`**.
+      * Définissez la variable **`DATABASE_URL`** en utilisant l'adresse IP de votre serveur SGBD (VM ou Docker) et les identifiants créés à l'Étape 1.
+
+    <!-- end list -->
+
+    ```env
+    # Format : mysql://USER:PASSWORD@HOST_IP:PORT/DB_NAME
+    DATABASE_URL="mysql://app:password_fort@<IP_DE_VOTRE_VM>:3306/easybts_db"
+    ```
+
+2.  **Création de la Base de Données Logique** :
+
+      * Se connecte au serveur SGBD et envoie l'instruction `CREATE DATABASE easybts_db;`.
 
 <!-- end list -->
 
@@ -85,7 +107,8 @@ Nous utilisons l'outil Doctrine pour gérer la base de données.
 php bin/console doctrine:database:create
 ```
 
-3.  **Création des Tables (Schéma)** : Exécutez les migrations pour appliquer la structure des tables (schéma) définie par les entités Doctrine.
+3.  **Création des Tables (Schéma)** :
+      * Exécute toutes les migrations Doctrine pour créer toutes les tables et colonnes basées sur les Entités du projet.
 
 <!-- end list -->
 
@@ -93,34 +116,35 @@ php bin/console doctrine:database:create
 php bin/console doctrine:migrations:migrate --no-interaction
 ```
 
-### 3.3. Étape 3 : Insertion des Données de Test (Fixtures) 📝
+### 3.4. Étape 4 : Insertion des Données de Test (Fixtures) 📝
 
-Pour le test, nous injectons un jeu de **15 dossiers diversifiés** incluant différents statuts (`valide`, `refusé`, `en_attente`).
+Pour le développement, nous injectons 15 dossiers de test complets, incluant tous les scénarios de statut possibles.
 
-1.  **Vérification du Fichier SQL** : Confirmez que le fichier **`diversity_fixtures_final.sql`** (contenant toutes les commandes `TRUNCATE` et `INSERT`) se trouve dans le dossier **`sql/`**.
+1.  **Vérification du Fichier Source** : Confirmez que le script **`diversity_fixtures_final.sql`** est présent dans le dossier **`sql/`**.
 
-2.  **Exécution du Script** : La commande ci-dessous lit le fichier et exécute son contenu via l'outil Doctrine.
+2.  **Exécution du Script SQL** :
+
+      * Cette commande lit le contenu du fichier et l'envoie à la BDD. Elle est conçue pour **vider les tables existantes** (`TRUNCATE TABLE`) avant d'insérer les nouvelles données.
 
 <!-- end list -->
 
 ```bash
-# ATTENTION : Cette commande VIDE d'abord les tables (TRUNCATE TABLE)
+# COMMANDE EXÉCUTANT LE FICHIER DE FIXTURES
 php bin/console doctrine:query:sql "$(cat sql/diversity_fixtures_final.sql)"
 ```
 
-**Résultat :** La base de données est maintenant remplie, et les comptes de test sont accessibles.
+**Comptes de Test Pré-chargés :**
 
 | Rôle | Identifiant | Mot de Passe | Statut dans la BDD |
 | :--- | :--- | :--- | :--- |
 | **Administrateur** | `admin@fulbert.fr` | `password` | `ROLE_ADMIN` |
-| **Étudiant (Validé)** | `samir.elhassani@test.com` | `password` | `ROLE_USER` (`statut: valide`) |
-| **Étudiant (Refusé)** | `marc.legrand@test.com` | `password` | `ROLE_USER` (`statut: refusé`) |
+| **Étudiant (Validé)** | `samir.elhassani@test.com` | `password` | `statut: valide` |
 
-### 3.4. Étape 4 : Démarrage et Vérification
+### 3.5. Étape 5 : Démarrage du Serveur et Validation Finale
 
-Lancez l'application pour commencer le développement ou les tests.
+L'application est maintenant entièrement configurée et prête à être exécutée.
 
-1.  **Démarrage du Serveur** :
+1.  **Lancement du Serveur** :
 
 <!-- end list -->
 
@@ -129,15 +153,9 @@ symfony server:start
 ```
 
 2.  **Accès à l'Application** :
+      * Ouvrez votre navigateur à l'adresse : **`https://127.0.0.1:8000/`**
 
-<!-- end list -->
+**Validation Finale :**
 
-  * Ouvrez votre navigateur à l'adresse : **`https://127.0.0.1:8000/`**
-
-### 3.5. Guide Post-Installation
-
-Une fois le site lancé, effectuez ces vérifications rapides :
-
-1.  **Vérification Administrateur** : Connectez-vous avec `admin@fulbert.fr / password`. Vous devriez voir les **15 dossiers** dans le tableau de bord d'administration.
-2.  **Vérification Étudiant** : Déconnectez-vous, puis connectez-vous avec `samir.elhassani@test.com / password`. Vous devriez voir son dossier avec le statut **Validé**.
-3.  **Vérification du Schéma** : Vous pouvez vérifier la structure des tables directement dans votre outil SGBD (ex: phpMyAdmin, DBeaver).
+  * **Test Admin** : Connectez-vous avec `admin@fulbert.fr` et vérifiez que le tableau de bord affiche les **15 dossiers** chargés.
+  * **Test Utilisateur** : Connectez-vous avec `samir.elhassani@test.com` pour vérifier l'affichage du statut `validé`.
