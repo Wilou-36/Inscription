@@ -1,182 +1,143 @@
-# 📚 Documentation d'installation - EasyBTS Lycée Fulbert (V1)
+# 🎓 EasyBTS - Lycée Fulbert (V1) : Documentation Technique
 
+## Application d'Inscription en BTS SIO (SLAM / SISR)
 
-
-**Pour qui :** Ce document explique comment l'application fonctionne, comment l'installer et comment la maintenir.
-
-
-
-## 1\. Ce que Fait l'Application et Pourquoi (Buts du Projet) 💡
-
-
-
-### 1.1 Buts de la Version Actuelle (V1)
-
-
-
-L'objectif est de remplacer le **dossier papier par un système en ligne**.
-
-
-
-| Ce que le Site fait | Explication Simple | Terme Technique (Pour Mémoire) |
-
-
-| **Garder l'avancement** | Si un étudiant quitte le site sans finir, il peut revenir et retrouver toutes ses informations pré-remplies. | **Gestion du Brouillon** |
-
-| **Sécurité des Comptes** | Le système vérifie qui vous êtes (mot de passe fort) et donne des accès différents : Étudiant ou Administrateur. | **Authentification et Rôles** |
-
-| **Suivi des Dossiers** | Le secrétariat peut changer l'état du dossier (Ex: "En Attente" devient "**Validé**" ou "**Refusé**"). | **Workflow Administratif** |
-
-| **Export des Infos** | Le secrétariat peut télécharger toutes les données dans un fichier prêt à être utilisé dans d'autres logiciels (Ex: Excel ou le logiciel de gestion de l'école). | **Export CSV** |
-
-
-
-### 1.2 Comment on Garantit la Sécurité et la Fiabilité 🔒
-
-
-
-  * **Mots de Passe Secrets** : Les mots de passe sont transformés en codes illisibles (hashés) pour qu'ils ne puissent jamais être vus, même par l'administrateur du site.
-
-  * **Trace des Décisions** : Chaque fois qu'un administrateur change l'état d'un dossier (de "En Attente" à "Validé"), le système enregistre automatiquement cette action dans un journal de bord.
-
-
+Ce projet vise à **numériser** le processus de candidature au BTS SIO, offrant une plateforme sécurisée pour les étudiants et un outil de gestion efficace pour le secrétariat.
 
 -----
 
+## 1\. 🚀 Contexte Technique et Stack
 
+L'application est développée sous l'architecture **LAMP** (Linux, Apache/Nginx, MySQL/MariaDB, PHP) et utilise le framework Symfony pour structurer le code.
 
-## 2\. Comment les Données sont Organisées (Le Plan de la Base de Données) 🗺️
+### 1.1. Technologies Principales
 
+| Technologie | Version | Rôle dans le Projet |
+| :--- | :--- | :--- |
+| **PHP** | 8.1+ | Langage de programmation principal. |
+| **Symfony** | 6.x / 7.x | Framework backend (structure, routing, services). |
+| **Doctrine ORM** | -- | Gestion de la persistance des données (mapping Objet-Relationnel). |
+| **MySQL / MariaDB** | -- | Système de Gestion de Base de Données (SGBD). |
+| **Twig** | -- | Moteur de template pour l'affichage côté client (Vue). |
+| **Bootstrap** | 5.x | Framework CSS pour le design et le responsive. |
 
+### 1.2. Organisation du Code (Architecture MVC)
 
-### 2.1 Le Plan du Dossier (Modèle de Données)
+Le code suit le modèle **MVC (Modèle-Vue-Contrôleur)**, ce qui garantit une séparation claire des responsabilités :
 
-
-
-Toutes les informations (adresse, documents, scolarité) sont rangées dans des **tiroirs** (les tables de la base de données). L'étudiant est le **dossier principal** qui relie tous les tiroirs entre eux.
-
-
-
-  * **Le Dossier Central (`Etudiant`)** : C'est le point de départ. Il contient le nom, l'email et l'état (`statut`) du dossier. Il utilise des **liens uniques** pour pointer vers toutes les autres informations.
-
-  * **Les Liens Uniques (Relation 1 pour 1)** : Un étudiant correspond exactement à **UNE** adresse, **UN** compte utilisateur, **UN** dossier de scolarité, et **UN** jeu de documents. Cela évite les erreurs et assure que le dossier est complet.
-
-  * **Les Liens de Référence** : Le dossier de scolarité est relié à des listes prédéfinies, comme la liste des **formations disponibles** (`Scolarite`) ou la liste des **années scolaires**.
-
-
-
------
-
-
-
-## 3\. Comment les Parties de l'Application Communiquent (Le Code) ⚙️
-
-
-
-L'application est construite avec **Symfony (un outil puissant en PHP)**, suivant le modèle **MVC (Modèle-Vue-Contrôleur)**.
-
-
-
-| Nom du Code | Rôle dans l'Application | Ce qu'il fait en Détail |
-
-
-
-| **Inscription** (Contrôleur) | **Gère tout le formulaire** que l'étudiant remplit. | Récupère toutes les données, les vérifie, gère l'envoi des documents (Ex: Carte Vitale), et stocke le brouillon. |
-
-| **Administration** (Contrôleur) | **Le tableau de bord** du secrétariat. | Permet de filtrer les dossiers, de changer leur statut (Validation/Refus), et d'exporter les listes dans un fichier CSV. |
-
-| **Sécurité** (Contrôleur) | **Gère l'accès** au site. | Vérifie les mots de passe et les rôles. C'est ici qu'on crée les comptes "Administrateur" et "Étudiant". |
-
-
-
-### Le Service Email (Notification)
-
-
-
-Quand un dossier est validé ou refusé, le système utilise un service d'envoi d'e-mails pour prévenir l'étudiant automatiquement.
-
-
+  * **Contrôleur (`src/Controller`)** : Gère la logique de la requête HTTP, appelle le Modèle, et prépare la Vue (ex: `InscriptionController.php`).
+  * **Modèle (`src/Entity`, `src/Repository`)** : Représente les données (Entités Doctrine) et gère l'interaction avec la base de données.
+  * **Vue (`templates/`)** : Affiche les données grâce au moteur Twig (le HTML final).
 
 -----
 
+## 2\. 🛡️ Modèle de Données et Sécurité
 
+Le schéma de la base de données est structuré pour maximiser la cohérence et minimiser la redondance.
 
-## 4\. Guide d'Installation (Pour Démarrer le Projet) 🛠️
+### 2.1. Structure du Dossier
 
+L'entité `Etudiant` est le cœur du système. Toutes les autres informations sont liées à celle-ci via des relations un-à-un (`OneToOne`), garantissant que chaque dossier est complet et unique.
 
+  * **`Etudiant`** : Détails du candidat (`nom`, `prenom`, `statut`, `date_naissance`).
+  * **`Utilisateur`** : Gestion de la connexion (`identifiant`, `mot_de_passe`, `role`). Relation un-à-un avec l'étudiant.
+  * **`DossierScolarite`** : Parcours académique antérieur (`regime_sco`, `specialite`).
+  * **`DocEtudiant`** : Liens vers les documents dématérialisés (`carte_vitale`, `diplome`, etc.).
 
-Ce guide explique comment installer le projet **de A à Z** sur un nouvel ordinateur.
+### 2.2. Gestion des Rôles
 
+Deux rôles principaux sont définis :
 
+  * `ROLE_USER` : Accès aux formulaires d'inscription et à la page de suivi de son propre dossier.
+  * `ROLE_ADMIN` : Accès au tableau de bord d'administration, filtration, validation/refus, et export des données.
 
-### 4.1. Étape 1 : Préparer l'Ordinateur
+La vérification des accès est gérée par le composant **Symfony Security**.
 
+-----
 
+## 3\. ⚙️ Guide d'Installation (Pas-à-Pas Détaillé)
 
-Vous avez besoin de ces outils de base pour faire fonctionner le site :
+Ce guide permet d'initialiser l'environnement de développement complet et de le peupler avec les données de test.
 
+### 3.1. Étape 1 : Préparation du Projet
 
+Assurez-vous d'avoir les outils prérequis (PHP 8.1+, Composer, Git) installés et configurés.
 
-1.  **PHP 8.1 ou plus** (le langage de programmation).
+| Commande | Description |
+| :--- | :--- |
+| `git clone https://github.com/Wilou-36/Inscription easybts` | Télécharge le code source du projet. |
+| `cd easybts` | Se place dans le répertoire de travail. |
+| `composer install` | Installe toutes les dépendances PHP et initialise les fichiers d'autoload. |
 
-2.  **Composer** (l'outil pour télécharger les pièces du site).
+### 3.2. Étape 2 : Configuration et Schéma de la Base de Données
 
-3.  **Git** (l'outil pour copier le projet).
+Nous utilisons l'outil Doctrine pour gérer la base de données.
 
-4.  **MySQL** ou **MariaDB** (le logiciel pour gérer la base de données).
+1.  **Configuration de la Connexion** : Ouvrez le fichier **`.env.local`** et définissez la chaîne de connexion `DATABASE_URL` pour pointer vers votre instance MySQL locale.
 
+    *Exemple :* `DATABASE_URL="mysql://root:motdepasse@127.0.0.1:3306/easybts_db"`
 
+2.  **Création de la Base de Données** : Cette commande utilise la configuration du `.env` pour créer la base de données vide.
 
-### 4.2. Étape 2 : Installer le Projet
+<!-- end list -->
 
+```bash
+php bin/console doctrine:database:create
+```
 
+3.  **Création des Tables (Schéma)** : Exécutez les migrations pour appliquer la structure des tables (schéma) définie par les entités Doctrine.
 
-1.  **Copier le Code** : Ouvrez le terminal (ligne de commande) et copiez le projet :
+<!-- end list -->
 
-    ```bash
+```bash
+php bin/console doctrine:migrations:migrate --no-interaction
+```
 
-    git clone https://github.com/Wilou-36/Inscription easybts
+### 3.3. Étape 3 : Insertion des Données de Test (Fixtures) 📝
 
-    cd easybts
+Pour le test, nous injectons un jeu de **15 dossiers diversifiés** incluant différents statuts (`valide`, `refusé`, `en_attente`).
 
-    ```
+1.  **Vérification du Fichier SQL** : Confirmez que le fichier **`diversity_fixtures_final.sql`** (contenant toutes les commandes `TRUNCATE` et `INSERT`) se trouve dans le dossier **`sql/`**.
 
-2.  **Installer les Pièces** : Téléchargez toutes les dépendances :
+2.  **Exécution du Script** : La commande ci-dessous lit le fichier et exécute son contenu via l'outil Doctrine.
 
-    ```bash
+<!-- end list -->
 
-    composer install
+```bash
+# ATTENTION : Cette commande VIDE d'abord les tables (TRUNCATE TABLE)
+php bin/console doctrine:query:sql "$(cat sql/diversity_fixtures_final.sql)"
+```
 
-    ```
+**Résultat :** La base de données est maintenant remplie, et les comptes de test sont accessibles.
 
-3.  **Lier la Base de Données** : Dans le fichier de configuration **`.env.local`**, entrez les identifiants pour que le site puisse parler à votre base de données.
+| Rôle | Identifiant | Mot de Passe | Statut dans la BDD |
+| :--- | :--- | :--- | :--- |
+| **Administrateur** | `admin@fulbert.fr` | `password` | `ROLE_ADMIN` |
+| **Étudiant (Validé)** | `samir.elhassani@test.com` | `password` | `ROLE_USER` (`statut: valide`) |
+| **Étudiant (Refusé)** | `marc.legrand@test.com` | `password` | `ROLE_USER` (`statut: refusé`) |
 
-4.  **Créer les Tiroirs** : Le système utilise **Doctrine** pour créer toutes les tables (les tiroirs) automatiquement :
+### 3.4. Étape 4 : Démarrage et Vérification
 
-    ```bash
+Lancez l'application pour commencer le développement ou les tests.
 
-    php bin/console doctrine:database:create
+1.  **Démarrage du Serveur** :
 
-    php bin/console doctrine:migrations:migrate --no-interaction
+<!-- end list -->
 
-    ```
+```bash
+symfony server:start
+```
 
+2.  **Accès à l'Application** :
 
+<!-- end list -->
 
-### 4.3. Étape 3 : Lancer le Site
+  * Ouvrez votre navigateur à l'adresse : **`https://127.0.0.1:8000/`**
 
+### 3.5. Guide Post-Installation
 
+Une fois le site lancé, effectuez ces vérifications rapides :
 
-1.  **Démarrer le Serveur** :
-
-    ```bash
-
-    symfony server:start
-
-    ```
-
-2.  **Créer un compte** : Accédez à l'adresse **`https://127.0.0.1:8000/`** dans votre navigateur et créez le premier compte d'une longue série.
-
-
-
-Le site est maintenant opérationnel. Vous pouvez vous connecter pour accéder à votre dossier d'inscription ou au tableau de bord de l'administration.
+1.  **Vérification Administrateur** : Connectez-vous avec `admin@fulbert.fr / password`. Vous devriez voir les **15 dossiers** dans le tableau de bord d'administration.
+2.  **Vérification Étudiant** : Déconnectez-vous, puis connectez-vous avec `samir.elhassani@test.com / password`. Vous devriez voir son dossier avec le statut **Validé**.
+3.  **Vérification du Schéma** : Vous pouvez vérifier la structure des tables directement dans votre outil SGBD (ex: phpMyAdmin, DBeaver).
