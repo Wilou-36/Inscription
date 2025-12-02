@@ -1,0 +1,385 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Dossier d'inscription - {{ etudiant.nom }} {{ etudiant.prenom }}{% endblock %}
+
+{% block stylesheets %}
+<style>
+    @media print {
+        .fr-header, .fr-footer, .no-print {
+            display: none !important;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="fr-container fr-py-6w">
+    <div class="fr-grid-row">
+        <div class="fr-col-12">
+            <!-- Breadcrumb -->
+            <nav role="navigation" class="fr-breadcrumb no-print" aria-label="vous êtes ici :">
+                <button class="fr-breadcrumb__button" aria-expanded="false" aria-controls="breadcrumb-detail">Voir le fil d'Ariane</button>
+                <div class="fr-collapse" id="breadcrumb-detail">
+                    <ol class="fr-breadcrumb__list">
+                        <li>
+                            <a class="fr-breadcrumb__link" href="/">Accueil</a>
+                        </li>
+                        <li>
+                            <a class="fr-breadcrumb__link" href="{{ path('app_admin_dashboard') }}">Administration</a>
+                        </li>
+                        <li>
+                            <a class="fr-breadcrumb__link" href="{{ path('app_admin_inscriptions') }}">Inscriptions</a>
+                        </li>
+                        <li>
+                            <a class="fr-breadcrumb__link" aria-current="page">{{ etudiant.nom|slice(0, 20) }}</a>
+                        </li>
+                    </ol>
+                </div>
+            </nav>
+
+            <!-- Alertes -->
+            {% for message in app.flashes('success') %}
+                <div class="fr-alert fr-alert--success fr-mb-4w">
+                    <p>{{ message }}</p>
+                </div>
+            {% endfor %}
+            
+            {% for message in app.flashes('error') %}
+                <div class="fr-alert fr-alert--error fr-mb-4w">
+                    <p>{{ message }}</p>
+                </div>
+            {% endfor %}
+
+            <!-- En-tête du dossier -->
+            <div class="fr-grid-row fr-grid-row--middle fr-mb-4w">
+                <div class="fr-col-12 fr-col-md-8">
+                    <h1 class="fr-h1 fr-mb-2w">
+                        Dossier d'inscription #{{ etudiant.idEtudiant }}
+                    </h1>
+                    <p class="fr-text--lead fr-mb-0">{{ etudiant.nom }} {{ etudiant.prenom }}</p>
+                </div>
+                <div class="fr-col-12 fr-col-md-4 no-print">
+                    {% if etudiant.statut == 'valide' %}
+                        <p class="fr-badge fr-badge--success">Validé</p>
+                    {% elseif etudiant.statut == 'refuse' %}
+                        <p class="fr-badge fr-badge--error">Refusé</p>
+                    {% else %}
+                        <p class="fr-badge fr-badge--warning">En attente</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="fr-btns-group fr-mb-4w no-print">
+                <a class="fr-btn fr-btn--secondary" href="{{ path('app_admin_inscriptions') }}">
+                    Retour à la liste
+                </a>
+                <button class="fr-btn fr-btn--tertiary" onclick="window.print()">
+                    Imprimer
+                </button>
+                {% if etudiant.statut != 'valide' %}
+                    <button class="fr-btn" 
+                            data-fr-opened="false" 
+                            aria-controls="modal-valider"
+                            style="background-color: var(--background-action-high-success);">
+                        Valider le dossier
+                    </button>
+                {% endif %}
+                {% if etudiant.statut != 'refuse' %}
+                    <button class="fr-btn fr-btn--secondary"
+                            data-fr-opened="false" 
+                            aria-controls="modal-refuser"
+                            style="background-color: var(--background-action-high-error); color: white;">
+                        Refuser le dossier
+                    </button>
+                {% endif %}
+            </div>
+
+            <!-- Informations personnelles -->
+            <h2 class="fr-h3 fr-mt-6w">Informations personnelles</h2>
+            <div class="fr-table fr-mb-4w">
+                <table>
+                    <tbody>
+                        <tr>
+                            <th scope="row">Nom</th>
+                            <td>{{ etudiant.nom }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Prénom</th>
+                            <td>{{ etudiant.prenom }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Date de naissance</th>
+                            <td>{{ etudiant.dateNaissance ? etudiant.dateNaissance|date('d/m/Y') : 'Non renseignée' }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Sexe</th>
+                            <td>{{ etudiant.sexe ? 'Masculin' : 'Féminin' }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Email</th>
+                            <td>{{ etudiant.email }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Téléphone</th>
+                            <td>{{ etudiant.tel }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Adresse -->
+            {% if etudiant.adresse %}
+            <h2 class="fr-h3 fr-mt-6w">Adresse</h2>
+            <div class="fr-table fr-mb-4w">
+                <table>
+                    <tbody>
+                        <tr>
+                            <th scope="row">Rue</th>
+                            <td>{{ etudiant.adresse.rue }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Commune</th>
+                            <td>{{ etudiant.adresse.commune }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Département</th>
+                            <td>{{ etudiant.adresse.departement }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            {% endif %}
+
+            <!-- Responsable légal -->
+            {% if etudiant.responsableLegal %}
+            <h2 class="fr-h3 fr-mt-6w">Responsable légal</h2>
+            <div class="fr-table fr-mb-4w">
+                <table>
+                    <tbody>
+                        <tr>
+                            <th scope="row">Nom</th>
+                            <td>{{ etudiant.responsableLegal.nom }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Prénom</th>
+                            <td>{{ etudiant.responsableLegal.prenom }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Email</th>
+                            <td>{{ etudiant.responsableLegal.email ?: 'Non renseigné' }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Téléphone</th>
+                            <td>{{ etudiant.responsableLegal.tel ?: 'Non renseigné' }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Profession</th>
+                            <td>{{ etudiant.responsableLegal.profession ?: 'Non renseignée' }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            {% endif %}
+
+            <!-- Scolarité -->
+            {% if etudiant.dossSco %}
+            <h2 class="fr-h3 fr-mt-6w">Scolarité</h2>
+            <div class="fr-table fr-mb-4w">
+                <table>
+                    <tbody>
+                        <tr>
+                            <th scope="row">Régime scolaire</th>
+                            <td>{{ etudiant.dossSco.regimeSco }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Spécialité</th>
+                            <td>{{ etudiant.dossSco.specialite }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Dernier diplôme</th>
+                            <td>{{ etudiant.diplome ?: 'Non renseigné' }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            {% endif %}
+
+            <!-- Transport -->
+            {% if etudiant.transport %}
+            <h2 class="fr-h3 fr-mt-6w">Transport</h2>
+            <div class="fr-table fr-mb-4w">
+                <table>
+                    <tbody>
+                        <tr>
+                            <th scope="row">Moyen de transport</th>
+                            <td>{{ etudiant.transport.vehicule ?: 'Non renseigné' }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Immatriculation</th>
+                            <td>{{ etudiant.transport.pDimmatriculation ?: 'Non renseignée' }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            {% endif %}
+
+            <!-- Documents joints -->
+            {% if etudiant.docEtudiant %}
+            <h2 class="fr-h3 fr-mt-6w">Documents joints</h2>
+            <div class="fr-table fr-mb-4w">
+                <table>
+                    <tbody>
+                        {% if etudiant.docEtudiant.carteVitale %}
+                        <tr>
+                            <th scope="row">Carte Vitale</th>
+                            <td>
+                                <a href="{{ asset('uploads/documents/' ~ etudiant.docEtudiant.carteVitale) }}" target="_blank" class="fr-btn fr-btn--sm fr-btn--secondary">
+                                    Télécharger
+                                </a>
+                            </td>
+                        </tr>
+                        {% endif %}
+                        {% if etudiant.docEtudiant.diplome %}
+                        <tr>
+                            <th scope="row">Dernier diplôme</th>
+                            <td>
+                                <a href="{{ asset('uploads/documents/' ~ etudiant.docEtudiant.diplome) }}" target="_blank" class="fr-btn fr-btn--sm fr-btn--secondary">
+                                    Télécharger
+                                </a>
+                            </td>
+                        </tr>
+                        {% endif %}
+                        {% if etudiant.docEtudiant.photoIdentite %}
+                        <tr>
+                            <th scope="row">Photo d'identité</th>
+                            <td>
+                                <a href="{{ asset('uploads/documents/' ~ etudiant.docEtudiant.photoIdentite) }}" target="_blank" class="fr-btn fr-btn--sm fr-btn--secondary">
+                                    Télécharger
+                                </a>
+                            </td>
+                        </tr>
+                        {% endif %}
+                        {% if etudiant.docEtudiant.certificatScolarite %}
+                        <tr>
+                            <th scope="row">Certificat de scolarité</th>
+                            <td>
+                                <a href="{{ asset('uploads/documents/' ~ etudiant.docEtudiant.certificatScolarite) }}" target="_blank" class="fr-btn fr-btn--sm fr-btn--secondary">
+                                    Télécharger
+                                </a>
+                            </td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+            {% endif %}
+
+            <!-- Avertissement -->
+            <div class="fr-alert fr-alert--info fr-mb-4w no-print">
+                <p class="fr-alert__title">Document officiel</p>
+                <p>Ce dossier d'inscription est un document officiel de l'établissement. Les informations contenues dans ce document sont confidentielles et ne doivent être communiquées qu'aux personnes autorisées.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Validation -->
+<dialog id="modal-valider" class="fr-modal" role="dialog" aria-labelledby="modal-valider-title">
+    <div class="fr-container fr-container--fluid fr-container-md">
+        <div class="fr-grid-row fr-grid-row--center">
+            <div class="fr-col-12 fr-col-md-8 fr-col-lg-6">
+                <div class="fr-modal__body">
+                    <div class="fr-modal__header">
+                        <button class="fr-btn--close fr-btn" aria-controls="modal-valider" title="Fermer">
+                            Fermer
+                        </button>
+                    </div>
+                    <div class="fr-modal__content">
+                        <h1 id="modal-valider-title" class="fr-modal__title">
+                            <span class="fr-icon-checkbox-circle-line fr-icon--lg" aria-hidden="true"></span>
+                            Valider le dossier d'inscription
+                        </h1>
+                        <form method="post" action="{{ path('app_admin_inscription_valider', {id: etudiant.idEtudiant}) }}">
+                            <div class="fr-input-group">
+                                <label class="fr-label" for="message-valider">
+                                    Message pour l'étudiant (optionnel)
+                                    <span class="fr-hint-text">Ce message sera affiché sur le tableau de bord de l'étudiant</span>
+                                </label>
+                                <textarea class="fr-input" 
+                                          id="message-valider" 
+                                          name="message" 
+                                          rows="4"
+                                          placeholder="Félicitations ! Votre dossier a été validé..."></textarea>
+                            </div>
+                            <div class="fr-btns-group fr-btns-group--right fr-btns-group--inline-lg">
+                                <button class="fr-btn fr-btn--secondary" 
+                                        type="button"
+                                        aria-controls="modal-valider">
+                                    Annuler
+                                </button>
+                                <button class="fr-btn" type="submit">
+                                    Confirmer la validation
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</dialog>
+
+<!-- Modal Refus -->
+<dialog id="modal-refuser" class="fr-modal" role="dialog" aria-labelledby="modal-refuser-title">
+    <div class="fr-container fr-container--fluid fr-container-md">
+        <div class="fr-grid-row fr-grid-row--center">
+            <div class="fr-col-12 fr-col-md-8 fr-col-lg-6">
+                <div class="fr-modal__body">
+                    <div class="fr-modal__header">
+                        <button class="fr-btn--close fr-btn" aria-controls="modal-refuser" title="Fermer">
+                            Fermer
+                        </button>
+                    </div>
+                    <div class="fr-modal__content">
+                        <h1 id="modal-refuser-title" class="fr-modal__title">
+                            <span class="fr-icon-close-circle-line fr-icon--lg" aria-hidden="true"></span>
+                            Refuser le dossier d'inscription
+                        </h1>
+                        <div class="fr-alert fr-alert--warning fr-mb-3w">
+                            <p class="fr-alert__title">Attention</p>
+                            <p>Vous devez obligatoirement indiquer le motif du refus.</p>
+                        </div>
+                        <form method="post" action="{{ path('app_admin_inscription_refuser', {id: etudiant.idEtudiant}) }}">
+                            <div class="fr-input-group">
+                                <label class="fr-label" for="message-refuser">
+                                    Motif du refus <span class="fr-text--error">*</span>
+                                    <span class="fr-hint-text">Ce message sera affiché sur le tableau de bord de l'étudiant</span>
+                                </label>
+                                <textarea class="fr-input" 
+                                          id="message-refuser" 
+                                          name="message" 
+                                          rows="5"
+                                          required
+                                          placeholder="Votre dossier a été refusé pour les raisons suivantes..."></textarea>
+                            </div>
+                            <div class="fr-btns-group fr-btns-group--right fr-btns-group--inline-lg">
+                                <button class="fr-btn fr-btn--secondary" 
+                                        type="button"
+                                        aria-controls="modal-refuser">
+                                    Annuler
+                                </button>
+                                <button class="fr-btn" 
+                                        type="submit"
+                                        style="background-color: var(--background-action-high-error);">
+                                    Confirmer le refus
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</dialog>
+
+{% endblock %}

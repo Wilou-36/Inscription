@@ -1,0 +1,173 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Administration - Utilisateurs{% endblock %}
+
+{% block body %}
+<div class="fr-container fr-py-6w">
+    <div class="fr-grid-row">
+        <div class="fr-col-12">
+            <nav role="navigation" aria-label="Fil d'Ariane">
+                <ol class="fr-breadcrumb__list">
+                    <li>
+                        <a class="fr-breadcrumb__link" href="/">Accueil</a>
+                    </li>
+                    <li>
+                        <a class="fr-breadcrumb__link" href="{{ path('app_admin_dashboard') }}">Administration</a>
+                    </li>
+                    <li>
+                        <a class="fr-breadcrumb__link" aria-current="page">Utilisateurs</a>
+                    </li>
+                </ol>
+            </nav>
+
+            <h1 class="fr-h1 fr-mb-4w">Gestion des utilisateurs</h1>
+
+            <div class="fr-btns-group fr-mb-4w">
+                <a class="fr-btn fr-btn--secondary fr-btn--sm" href="{{ path('app_admin_dashboard') }}">
+                    ← Retour au tableau de bord
+                </a>
+            </div>
+
+            <!-- Statistiques -->
+            <div class="fr-grid-row fr-grid-row--gutters fr-mb-4w">
+                <div class="fr-col-12 fr-col-md-4">
+                    <div class="fr-card fr-card--no-border fr-card--shadow">
+                        <div class="fr-card__body">
+                            <div class="fr-card__content">
+                                <h3 class="fr-card__title">
+                                    <span class="fr-icon-user-line" aria-hidden="true"></span>
+                                    Total utilisateurs
+                                </h3>
+                                <p class="fr-card__desc">
+                                    <strong style="font-size: 2rem;">{{ utilisateursData|length }}</strong>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="fr-col-12 fr-col-md-4">
+                    <div class="fr-card fr-card--no-border fr-card--shadow">
+                        <div class="fr-card__body">
+                            <div class="fr-card__content">
+                                <h3 class="fr-card__title">
+                                    <span class="fr-icon-checkbox-circle-line" aria-hidden="true"></span>
+                                    Avec inscription
+                                </h3>
+                                <p class="fr-card__desc">
+                                    <strong style="font-size: 2rem;">
+                                        {% set withInscription = utilisateursData|filter(u => u.hasInscription)|length %}
+                                        {{ withInscription }}
+                                    </strong>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="fr-col-12 fr-col-md-4">
+                    <div class="fr-card fr-card--no-border fr-card--shadow">
+                        <div class="fr-card__body">
+                            <div class="fr-card__content">
+                                <h3 class="fr-card__title">
+                                    <span class="fr-icon-account-circle-line" aria-hidden="true"></span>
+                                    Sans inscription
+                                </h3>
+                                <p class="fr-card__desc">
+                                    <strong style="font-size: 2rem;">
+                                        {% set withoutInscription = utilisateursData|filter(u => not u.hasInscription)|length %}
+                                        {{ withoutInscription }}
+                                    </strong>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Liste des utilisateurs -->
+            {% if utilisateursData|length > 0 %}
+                <div class="fr-table fr-table--bordered">
+                    <table>
+                        <caption>Liste de tous les utilisateurs inscrits sur la plateforme</caption>
+                        <thead>
+                            <tr>
+                                <th scope="col">Identifiant</th>
+                                <th scope="col">Rôle</th>
+                                <th scope="col">Étudiant associé</th>
+                                <th scope="col">Email</th>
+                                <th scope="col">Statut inscription</th>
+                                <th scope="col">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for data in utilisateursData %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ data.utilisateur.identifiant }}</strong>
+                                    </td>
+                                    <td>
+                                        {% if data.utilisateur.role == 'ROLE_ADMIN' %}
+                                            <span class="fr-badge fr-badge--purple-glycine">
+                                                <span class="fr-icon-shield-line" aria-hidden="true"></span>
+                                                Administrateur
+                                            </span>
+                                        {% else %}
+                                            <span class="fr-badge fr-badge--blue-ecume">
+                                                <span class="fr-icon-user-line" aria-hidden="true"></span>
+                                                Utilisateur
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if data.etudiant %}
+                                            {{ data.etudiant.prenom }} {{ data.etudiant.nom }}
+                                        {% else %}
+                                            <em class="fr-text--sm">Aucun étudiant associé</em>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if data.etudiant %}
+                                            {{ data.etudiant.email }}
+                                        {% else %}
+                                            <em class="fr-text--sm">N/A</em>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if data.hasInscription %}
+                                            {% set statut = data.etudiant.statut ?? 'en_attente' %}
+                                            {% if statut == 'valide' %}
+                                                <span class="fr-badge fr-badge--success fr-badge--sm">Validée</span>
+                                            {% elseif statut == 'refuse' %}
+                                                <span class="fr-badge fr-badge--error fr-badge--sm">Refusée</span>
+                                            {% else %}
+                                                <span class="fr-badge fr-badge--warning fr-badge--sm">En attente</span>
+                                            {% endif %}
+                                        {% else %}
+                                            <span class="fr-badge fr-badge--info fr-badge--sm">Pas d'inscription</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if data.hasInscription %}
+                                            <a href="{{ path('app_admin_inscription_detail', {id: data.etudiant.idEtudiant}) }}" 
+                                               class="fr-btn fr-btn--sm fr-btn--tertiary-no-outline"
+                                               title="Voir le dossier d'inscription">
+                                                <span class="fr-icon-eye-line" aria-hidden="true"></span>
+                                                Voir le dossier
+                                            </a>
+                                        {% else %}
+                                            <span class="fr-text--sm" style="color: #666;">Aucune action</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="fr-alert fr-alert--info">
+                    <p>Aucun utilisateur enregistré pour le moment.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

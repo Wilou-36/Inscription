@@ -1,0 +1,117 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Administration - Inscriptions{% endblock %}
+
+{% block body %}
+<div class="fr-container fr-py-6w">
+    <div class="fr-grid-row">
+        <div class="fr-col-12">
+            <nav role="navigation" aria-label="Fil d'Ariane">
+                <ol class="fr-breadcrumb__list">
+                    <li>
+                        <a class="fr-breadcrumb__link" href="/">Accueil</a>
+                    </li>
+                    <li>
+                        <a class="fr-breadcrumb__link" href="{{ path('app_admin_dashboard') }}">Administration</a>
+                    </li>
+                    <li>
+                        <a class="fr-breadcrumb__link" aria-current="page">Inscriptions</a>
+                    </li>
+                </ol>
+            </nav>
+
+            <h1 class="fr-h1 fr-mb-4w">Toutes les inscriptions</h1>
+
+            <div class="fr-btns-group fr-mb-4w">
+                <a class="fr-btn fr-btn--secondary fr-btn--sm" href="{{ path('app_admin_dashboard') }}">
+                    ← Retour au tableau de bord
+                </a>
+                <a class="fr-btn fr-btn--icon-left fr-icon-download-line" href="{{ path('app_admin_export_csv') }}">
+                    Exporter en CSV
+                </a>
+            </div>
+
+            <!-- Filtres -->
+            <form method="get" action="{{ path('app_admin_inscriptions') }}" class="fr-mb-4w">
+                <div class="fr-grid-row fr-grid-row--gutters">
+                    <div class="fr-col-12 fr-col-md-4">
+                        <div class="fr-select-group">
+                            <label class="fr-label" for="statut-filter">
+                                Filtrer par statut
+                            </label>
+                            <select class="fr-select" id="statut-filter" name="statut" onchange="this.form.submit()">
+                                <option value="tous" {% if statutFiltre == 'tous' %}selected{% endif %}>Tous les statuts</option>
+                                <option value="en_attente" {% if statutFiltre == 'en_attente' %}selected{% endif %}>En attente</option>
+                                <option value="valide" {% if statutFiltre == 'valide' %}selected{% endif %}>Validé</option>
+                                <option value="refuse" {% if statutFiltre == 'refuse' %}selected{% endif %}>Refusé</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="fr-col-12 fr-col-md-4">
+                        <div class="fr-select-group">
+                            <label class="fr-label" for="bts-filter">
+                                Filtrer par BTS
+                            </label>
+                            <select class="fr-select" id="bts-filter" name="bts" onchange="this.form.submit()">
+                                <option value="tous" {% if btsFiltre == 'tous' %}selected{% endif %}>Tous les BTS</option>
+                                <option value="CG" {% if btsFiltre == 'CG' %}selected{% endif %}>BTS CG</option>
+                                <option value="MCO" {% if btsFiltre == 'MCO' %}selected{% endif %}>BTS MCO</option>
+                                <option value="NDRC" {% if btsFiltre == 'NDRC' %}selected{% endif %}>BTS NDRC</option>
+                                <option value="SIO" {% if btsFiltre == 'SIO' %}selected{% endif %}>BTS SIO</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="fr-col-12 fr-col-md-4">
+                        <div class="fr-mt-4w">
+                            <button type="submit" class="fr-btn fr-btn--secondary">
+                                Appliquer les filtres
+                            </button>
+                            <a href="{{ path('app_admin_inscriptions') }}" class="fr-btn fr-btn--tertiary-no-outline">
+                                Réinitialiser
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </form>
+
+            {% if etudiants|length > 0 %}
+                <div class="fr-table">
+                    <table>
+                        <caption>Liste de toutes les inscriptions</caption>
+                        <thead>
+                            <tr>
+                                <th scope="col">ID</th>
+                                <th scope="col">Nom</th>
+                                <th scope="col">Prénom</th>
+                                <th scope="col">Email</th>
+                                <th scope="col">Téléphone</th>
+                                <th scope="col">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for etudiant in etudiants %}
+                                <tr>
+                                    <td>{{ etudiant.idEtudiant }}</td>
+                                    <td>{{ etudiant.nom }}</td>
+                                    <td>{{ etudiant.prenom }}</td>
+                                    <td>{{ etudiant.email }}</td>
+                                    <td>{{ etudiant.tel }}</td>
+                                    <td>
+                                        <a href="{{ path('app_admin_inscription_detail', {id: etudiant.idEtudiant}) }}" class="fr-btn fr-btn--sm" title="Voir les détails">
+                                            Détails
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="fr-alert fr-alert--info">
+                    <p>Aucune inscription enregistrée pour le moment.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,61 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Formations disponibles - Inscription BTS{% endblock %}
+
+{% block body %}
+<div class="fr-container fr-py-6w">
+    <div class="fr-grid-row fr-grid-row--center">
+        <div class="fr-col-12">
+            <!-- Breadcrumb -->
+            <nav role="navigation" class="fr-breadcrumb" aria-label="vous êtes ici :">
+                <button class="fr-breadcrumb__button" aria-expanded="false" aria-controls="breadcrumb-1">Voir le fil d'Ariane</button>
+                <div class="fr-collapse" id="breadcrumb-1">
+                    <ol class="fr-breadcrumb__list">
+                        <li>
+                            <a class="fr-breadcrumb__link" href="/">Accueil</a>
+                        </li>
+                        <li>
+                            <a class="fr-breadcrumb__link" aria-current="page">Formations disponibles</a>
+                        </li>
+                    </ol>
+                </div>
+            </nav>
+
+            <!-- Titre -->
+            <div class="fr-mb-6w">
+                <h1 class="fr-h1">Formations post-bac</h1>
+                <p class="fr-text--lead">Lycée Fulbert de Chartres</p>
+            </div>
+
+            <!-- BTS -->
+            <div class="fr-mb-8w">
+                <h2 class="fr-h3 fr-mb-4w">BTS (2 ans)</h2>
+                <ul class="fr-text--md">
+                    <li class="fr-mb-2w"><strong>BTS CG</strong> — Comptabilité et Gestion</li>
+                    <li class="fr-mb-2w"><strong>BTS CRSA</strong> — Conception et Réalisation de Systèmes Automatiques</li>
+                    <li class="fr-mb-2w"><strong>BTS Électrotechnique</strong></li>
+                    <li class="fr-mb-2w"><strong>BTS MCO</strong> — Management Commercial Opérationnel <span class="fr-badge fr-badge--sm fr-badge--green-emeraude fr-ml-1w">Alternance</span></li>
+                    <li class="fr-mb-2w"><strong>BTS NDRC</strong> — Négociation et Digitalisation de la Relation Client <span class="fr-badge fr-badge--sm fr-badge--green-emeraude fr-ml-1w">Alternance</span></li>
+                </ul>
+            </div>
+
+           
+            <!-- Informations générales -->
+            <div class="fr-alert fr-alert--info fr-mb-4w">
+                <h3 class="fr-alert__title">Informations générales</h3>
+                <ul>
+                    <li><strong>BTS :</strong> Accessibles après le baccalauréat, formations en 2 ans professionnalisantes</li>
+                    <li><strong>Alternance :</strong> Possible sur certaines formations (MCO, NDRC)</li>
+                    <li><strong>Poursuite d'études :</strong> Licence professionnelle, école de commerce, école d'ingénieurs selon la formation</li>
+                </ul>
+            </div>
+
+            <!-- Boutons -->
+            <div class="fr-btns-group fr-btns-group--center">
+                <a class="fr-btn" href="/">Retour à l'accueil</a>
+                <a class="fr-btn fr-btn--secondary" href="/inscription">Commencer mon inscription</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

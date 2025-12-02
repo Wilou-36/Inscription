@@ -1,0 +1,54 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mentions légales{% endblock %}
+
+{% block body %}
+<div class="fr-container fr-py-6w">
+    <div class="fr-grid-row fr-grid-row--center">
+        <div class="fr-col-12 fr-col-md-10">
+            <h1 class="fr-h1 fr-mb-4w">Mentions légales</h1>
+
+            <h2 class="fr-h3 fr-mt-6w">Éditeur</h2>
+            <p>Ce site est édité par :</p>
+            <p>
+                <strong>Ministère de l'Éducation Nationale et de la Jeunesse</strong><br>
+                110 rue de Grenelle<br>
+                75357 Paris 07 SP<br>
+                Téléphone : 01 55 55 10 10
+            </p>
+
+            <h2 class="fr-h3 fr-mt-6w">Directeur de la publication</h2>
+            <p>Le directeur de la publication est le Ministre de l'Éducation Nationale et de la Jeunesse.</p>
+
+            <h2 class="fr-h3 fr-mt-6w">Hébergement</h2>
+            <p>Ce site est hébergé par :</p>
+            <p>
+                <strong>Ministère de l'Éducation Nationale</strong><br>
+                Infrastructure technique gérée par la Direction du Numérique pour l'Éducation<br>
+                110 rue de Grenelle - 75357 Paris 07 SP
+            </p>
+
+            <h2 class="fr-h3 fr-mt-6w">Propriété intellectuelle</h2>
+            <p>
+                Sauf mention contraire, tous les textes de ce site sont sous 
+                <a href="https://github.com/etalab/licence-ouverte/blob/master/LO.md" target="_blank" rel="noopener">
+                    licence etalab-2.0
+                </a>.
+            </p>
+            <p>
+                Le code source de ce site est libre et peut être consulté sur demande.
+            </p>
+
+            <h2 class="fr-h3 fr-mt-6w">Crédits</h2>
+            <p>Ce site utilise le <a href="https://www.systeme-de-design.gouv.fr/" target="_blank" rel="noopener">Système de Design de l'État</a> (DSFR).</p>
+
+            <div class="fr-mt-6w">
+                <a href="{{ path('app_home') }}" class="fr-link">
+                    <span class="fr-icon-arrow-left-line fr-icon--sm" aria-hidden="true"></span>
+                    Retour à l'accueil
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

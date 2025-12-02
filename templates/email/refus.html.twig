@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background-color: #CE0500;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        .content {
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        .footer {
+            padding: 20px;
+            text-align: center;
+            font-size: 12px;
+            color: #666;
+        }
+        .warning-icon {
+            font-size: 48px;
+            text-align: center;
+            margin: 20px 0;
+        }
+        .button {
+            display: inline-block;
+            padding: 12px 24px;
+            background-color: #000091;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Lycée Fulbert</h1>
+            <p>Information concernant votre inscription</p>
+        </div>
+        
+        <div class="content">
+            <div class="warning-icon">⚠️</div>
+            
+            <h2>Bonjour {{ etudiant.prenom }} {{ etudiant.nom }},</h2>
+            
+            <p>Nous avons examiné votre demande d'inscription en <strong>BTS {{ dossier.scolarite.bts }}</strong>.</p>
+            
+            <p><strong>Numéro de dossier :</strong> {{ dossier.id }}</p>
+            
+            <p>Malheureusement, votre dossier n'a pas pu être validé pour la raison suivante :</p>
+            
+            {% if message %}
+            <p style="background-color: white; padding: 15px; border-left: 4px solid #CE0500;">
+                {{ message|nl2br }}
+            </p>
+            {% else %}
+            <p style="background-color: white; padding: 15px; border-left: 4px solid #CE0500;">
+                Dossier incomplet ou ne répondant pas aux critères d'admission.
+            </p>
+            {% endif %}
+            
+            <h3>Que faire maintenant ?</h3>
+            <ul>
+                <li>Vérifiez les documents manquants ou incorrects</li>
+                <li>Contactez le secrétariat pour plus d'informations</li>
+                <li>Vous pouvez soumettre une nouvelle demande si nécessaire</li>
+            </ul>
+            
+            <p>Pour toute question concernant votre dossier, nous restons à votre disposition.</p>
+            
+            <p style="text-align: center;">
+                <a href="{{ absolute_url(path('app_suivi')) }}" class="button">Voir mon dossier</a>
+            </p>
+        </div>
+        
+        <div class="footer">
+            <p>Lycée Fulbert - Inscription BTS</p>
+            <p>Service des inscriptions - Tel : XX XX XX XX XX</p>
+        </div>
+    </div>
+</body>
+</html>

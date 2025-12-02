@@ -1,17 +1,147 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr" data-fr-theme="light">
     <head>
         <meta charset="UTF-8">
-        <title>{% block title %}Welcome!{% endblock %}</title>
-        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>{% block title %}Inscription BTS - Ministère de l'Éducation Nationale{% endblock %}</title>
+        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>🇫🇷</text></svg>">
+        
+        <!-- CSS DSFR -->
+        <link rel="stylesheet" href="https://unpkg.com/@gouvfr/dsfr@latest/dist/dsfr.min.css">
+        
         {% block stylesheets %}
-        {% endblock %}
-
-        {% block javascripts %}
-            {% block importmap %}{{ importmap('app') }}{% endblock %}
         {% endblock %}
     </head>
     <body>
-        {% block body %}{% endblock %}
+        <!-- Lien d'évitement RGAA -->
+        <div class="fr-skiplinks">
+            <nav class="fr-container" role="navigation" aria-label="Accès rapide">
+                <ul class="fr-skiplinks__list">
+                    <li>
+                        <a class="fr-link" href="#contenu">Contenu</a>
+                    </li>
+                    <li>
+                        <a class="fr-link" href="#footer">Pied de page</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- En-tête -->
+        <header role="banner" class="fr-header">
+            <div class="fr-header__body">
+                <div class="fr-container">
+                    <div class="fr-header__body-row">
+                        <div class="fr-header__brand fr-enlarge-link">
+                            <div class="fr-header__brand-top">
+                                <div class="fr-header__logo">
+                                    <p class="fr-logo">
+                                        République
+                                        <br>Française
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="fr-header__service">
+                                <a href="/" title="Accueil - Inscription BTS">
+                                    <p class="fr-header__service-title">Inscription BTS</p>
+                                </a>
+                                <p class="fr-header__service-tagline">Ministère de l'Éducation Nationale et de la Jeunesse</p>
+                            </div>
+                        </div>
+                        <div class="fr-header__tools">
+                            <div class="fr-header__tools-links">
+                                <ul class="fr-btns-group">
+                                    {% if app.user %}
+                                        <li>
+                                            <a class="fr-btn fr-btn--tertiary-no-outline" href="{{ path('app_suivi') }}" title="Mon compte">
+                                                Mon compte
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="fr-btn fr-btn--sm" href="{{ path('app_logout') }}" title="Se déconnecter">
+                                                Déconnexion
+                                            </a>
+                                        </li>
+                                    {% else %}
+                                        <li>
+                                            <a class="fr-btn" href="{{ path('app_login') }}" title="Se connecter">
+                                                Connexion
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="fr-btn fr-btn--secondary" href="{{ path('app_register') }}" title="Créer un compte">
+                                                Inscription
+                                            </a>
+                                        </li>
+                                    {% endif %}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Contenu principal -->
+        <main id="contenu" role="main">
+            {% block body %}{% endblock %}
+        </main>
+
+        <!-- Pied de page -->
+        <footer id="footer" class="fr-footer" role="contentinfo">
+            <div class="fr-container">
+                <div class="fr-footer__body">
+                    <div class="fr-footer__brand fr-enlarge-link">
+                        <a href="/" title="Retour à l'accueil">
+                            <p class="fr-logo">
+                                République
+                                <br>Française
+                            </p>
+                        </a>
+                    </div>
+                    <div class="fr-footer__content">
+                        <p class="fr-footer__content-desc">
+                            Ministère de l'Éducation Nationale et de la Jeunesse
+                        </p>
+                        <ul class="fr-footer__content-list">
+                            <li class="fr-footer__content-item">
+                                <a class="fr-footer__content-link" href="https://legifrance.gouv.fr">legifrance.gouv.fr</a>
+                            </li>
+                            <li class="fr-footer__content-item">
+                                <a class="fr-footer__content-link" href="https://gouvernement.fr">gouvernement.fr</a>
+                            </li>
+                            <li class="fr-footer__content-item">
+                                <a class="fr-footer__content-link" href="https://service-public.fr">service-public.fr</a>
+                            </li>
+                            <li class="fr-footer__content-item">
+                                <a class="fr-footer__content-link" href="https://data.gouv.fr">data.gouv.fr</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="fr-footer__bottom">
+                    <ul class="fr-footer__bottom-list">
+                        <li class="fr-footer__bottom-item">
+                            <a class="fr-footer__bottom-link" href="/mentions-legales" title="Consulter les mentions légales du site">Mentions légales</a>
+                        </li>
+                        <li class="fr-footer__bottom-item">
+                            <a class="fr-footer__bottom-link" href="/donnees-personnelles" title="Consulter la politique de protection des données personnelles">Données personnelles</a>
+                        </li>
+                        <li class="fr-footer__bottom-item">
+                            <a class="fr-footer__bottom-link" href="/accessibilite" title="Consulter la déclaration d'accessibilité">Accessibilité : conforme</a>
+                        </li>
+                    </ul>
+                    <div class="fr-footer__bottom-copy">
+                        <p>Sauf mention contraire, tous les contenus de ce site sont sous licence Vyros, l'élégance de la technologie.</a></p>
+                    </div>
+                </div>
+            </div>
+        </footer>
+
+        <!-- JavaScript DSFR -->
+        <script src="https://unpkg.com/@gouvfr/dsfr@latest/dist/dsfr.module.min.js"></script>
+        
+        {% block javascripts %}
+        {% endblock %}
     </body>
 </html>

@@ -1,0 +1,969 @@
+{% extends 'base.html.twig' %}
+
+{% block stylesheets %}
+<style>
+    .fr-fieldset__content .fr-radio-group {
+        margin-bottom: 1rem;
+    }
+    .fr-fieldset__element input[type="radio"] + label {
+        margin-right: 2rem;
+    }
+    .form-step {
+        display: none;
+    }
+    .form-step.active {
+        display: block;
+    }
+    .step-navigation {
+        position: sticky;
+        top: 0;
+        background: var(--background-default-grey);
+        z-index: 100;
+        padding: 1rem 0;
+        border-bottom: 2px solid var(--border-default-grey);
+        margin-bottom: 2rem;
+    }
+    .step-indicator {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+    .step-item {
+        flex: 1;
+        text-align: center;
+        padding: 0.5rem;
+        position: relative;
+        cursor: pointer;
+    }
+    .step-item:not(:last-child)::after {
+        content: '';
+        position: absolute;
+        right: -50%;
+        top: 1.5rem;
+        width: 100%;
+        height: 2px;
+        background: var(--border-default-grey);
+        z-index: -1;
+    }
+    .step-item.completed:not(:last-child)::after {
+        background: var(--background-action-high-blue-france);
+    }
+    .step-number {
+        width: 3rem;
+        height: 3rem;
+        border-radius: 50%;
+        background: var(--background-contrast-grey);
+        border: 2px solid var(--border-default-grey);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+        color: var(--text-default-grey);
+    }
+    .step-item.active .step-number {
+        background: var(--background-action-high-blue-france);
+        border-color: var(--background-action-high-blue-france);
+        color: var(--text-inverted-grey);
+    }
+    .step-item.completed .step-number {
+        background: var(--background-contrast-blue-france);
+        border-color: var(--background-action-high-blue-france);
+        color: var(--background-action-high-blue-france);
+    }
+    .step-title {
+        font-size: 0.875rem;
+        color: var(--text-mention-grey);
+    }
+    .step-item.active .step-title {
+        color: var(--background-action-high-blue-france);
+        font-weight: bold;
+    }
+</style>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+    console.log('Script chargé');
+    
+    let currentStep = 1;
+    const totalSteps = 5;
+
+    // Fonction pour collecter toutes les données du formulaire
+    function getFormData() {
+        const formData = {};
+        const form = document.querySelector('#inscription-form');
+        
+        if (!form) {
+            return formData;
+        }
+        
+        const fields = form.querySelectorAll('input, select, textarea');
+        
+        fields.forEach(field => {
+            const name = field.name;
+            if (!name) return;
+            
+            const match = name.match(/\[(.+)\]/);
+            if (!match) {
+                return;
+            }
+            
+            const fieldName = match[1];
+            
+            if (field.type === 'radio') {
+                if (field.checked) {
+                    formData[fieldName] = field.value;
+                }
+            } else if (field.type === 'checkbox') {
+                if (field.checked) {
+                    formData[fieldName] = field.value || '1';
+                }
+            } else if (field.value && field.value.trim() !== '') {
+                formData[fieldName] = field.value;
+            }
+        });
+        
+        return formData;
+    }
+
+    // Fonction pour recharger les données dans le formulaire
+    function reloadCurrentStepData() {
+        const savedDataElement = document.getElementById('saved-data-json');
+        
+        if (!savedDataElement) {
+            return;
+        }
+        
+        const textContent = savedDataElement.textContent.trim();
+        
+        if (!textContent || textContent === '{}') {
+            return;
+        }
+        
+        try {
+            const savedData = JSON.parse(textContent);
+            
+            if (!savedData || Object.keys(savedData).length === 0) {
+                return;
+            }
+            
+            // Remplir tous les champs du formulaire
+            Object.keys(savedData).forEach(fieldName => {
+                const value = savedData[fieldName];
+                
+                // Essayer plusieurs patterns de sélection
+                let fields = document.querySelectorAll(`[name*="[${fieldName}]"]`);
+                
+                // Si pas trouvé, essayer avec le nom exact du formulaire
+                if (fields.length === 0) {
+                    fields = document.querySelectorAll(`[name="inscription_type[${fieldName}]"]`);
+                }
+                
+                // Si toujours pas trouvé, essayer par ID
+                if (fields.length === 0) {
+                    const fieldById = document.getElementById(`inscription_type_${fieldName}`);
+                    if (fieldById) {
+                        fields = [fieldById];
+                    }
+                }
+                
+                if (fields.length === 0) {
+                    return;
+                }
+                
+                fields.forEach(field => {
+                    if (field.type === 'radio') {
+                        if (field.value === value || field.value == value) {
+                            field.checked = true;
+                        }
+                    } else if (field.type === 'checkbox') {
+                        const shouldCheck = (value === field.value || value === 'on' || value === '1' || value === true || value === 1);
+                        if (shouldCheck) {
+                            field.checked = true;
+                        }
+                    } else {
+                        if (value) {
+                            field.value = value;
+                        }
+                    }
+                });
+            });
+        } catch (e) {
+            // Erreur silencieuse
+        }
+    }
+
+    window.showStep = function(stepNumber) {
+        // Masquer toutes les étapes
+        document.querySelectorAll('.form-step').forEach(step => {
+            step.classList.remove('active');
+        });
+        
+        // Afficher l'étape actuelle
+        const stepElement = document.querySelector(`.form-step[data-step="${stepNumber}"]`);
+        
+        if (stepElement) {
+            stepElement.classList.add('active');
+        }
+        
+        // Mettre à jour l'indicateur
+        document.querySelectorAll('.step-item').forEach((item, index) => {
+            item.classList.remove('active', 'completed');
+            const step = index + 1;
+            if (step < stepNumber) {
+                item.classList.add('completed');
+            } else if (step === stepNumber) {
+                item.classList.add('active');
+            }
+        });
+        
+        // Scroll vers le haut
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        
+        currentStep = stepNumber;
+    }
+
+    window.nextStep = function() {
+        if (currentStep < totalSteps) {
+            showStep(currentStep + 1);
+        }
+    }
+
+    window.prevStep = function() {
+        if (currentStep > 1) {
+            showStep(currentStep - 1);
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // Recharger les données sauvegardées au chargement (une seule fois)
+        reloadCurrentStepData();
+        
+        // Intercepter les clics sur les boutons "Sauvegarder"
+        const saveButtons = document.querySelectorAll('button[name="save_draft"]');
+        
+        saveButtons.forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                const formData = getFormData();
+                
+                if (Object.keys(formData).length === 0) {
+                    alert('Veuillez remplir au moins un champ avant de sauvegarder.');
+                    return;
+                }
+                
+                fetch('/inscription/save-draft', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify(formData)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    alert('Votre inscription a été sauvegardée.');
+                    window.location.href = '/';
+                })
+                .catch(error => {
+                    alert('Erreur lors de la sauvegarde.');
+                });
+            });
+        });
+        
+        // Attacher les événements aux boutons
+        document.querySelectorAll('.btn-next').forEach(btn => {
+            btn.addEventListener('click', nextStep);
+        });
+        
+        document.querySelectorAll('.btn-prev').forEach(btn => {
+            btn.addEventListener('click', prevStep);
+        });
+        
+        // Permettre de cliquer sur les indicateurs d'étape
+        document.querySelectorAll('.step-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const step = parseInt(this.dataset.step);
+                showStep(step);
+            });
+        });
+
+        // Gestion du champ diplome_autre
+        const diplomeSelect = document.getElementById('inscription_diplome');
+        const diplomeAutreField = document.getElementById('diplome-autre-field');
+        
+        if (diplomeSelect && diplomeAutreField) {
+            // Vérifier au chargement
+            if (diplomeSelect.value === 'Autre') {
+                diplomeAutreField.style.display = 'block';
+            }
+            
+            // Écouter les changements
+            diplomeSelect.addEventListener('change', function() {
+                if (this.value === 'Autre') {
+                    diplomeAutreField.style.display = 'block';
+                } else {
+                    diplomeAutreField.style.display = 'none';
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}
+
+{% block body %}
+
+<!-- Données sauvegardées injectées depuis le backend -->
+<script type="application/json" id="saved-data-json">
+{% if brouillon %}{{ brouillon|json_encode|raw }}{% else %}{}{% endif %}
+</script>
+
+<div class="fr-container fr-py-6w">
+    <div class="fr-grid-row fr-grid-row--center">
+        <div class="fr-col-12 fr-col-md-10">
+            <!-- Breadcrumb -->
+            <nav role="navigation" class="fr-breadcrumb" aria-label="vous êtes ici :">
+                <button class="fr-breadcrumb__button" aria-expanded="false" aria-controls="breadcrumb-1">Voir le fil d'Ariane</button>
+                <div class="fr-collapse" id="breadcrumb-1">
+                    <ol class="fr-breadcrumb__list">
+                        <li>
+                            <a class="fr-breadcrumb__link" href="/">Accueil</a>
+                        </li>
+                        <li>
+                            <a class="fr-breadcrumb__link" aria-current="page">Inscription</a>
+                        </li>
+                    </ol>
+                </div>
+            </nav>
+
+            <!-- Titre -->
+            <div class="fr-mb-4w">
+                <h1 class="fr-h1">Dossier d'inscription BTS</h1>
+                <p class="fr-text--lead">Année scolaire 2025/2026 - Service Infirmier</p>
+                <div class="fr-alert fr-alert--info fr-mt-2w">
+                    <h3 class="fr-alert__title">Documents à fournir</h3>
+                    <p>Ce dossier est à retourner au <strong>secrétariat de direction du Lycée Fulbert avant le 26 août 2025</strong>.</p>
+                    <ul class="fr-mb-0">
+                        <li>Une attestation de votre réussite au baccalauréat (photocopie de votre relevé de notes)</li>
+                        <li>La copie de votre carte vitale</li>
+                        <li>Une attestation de votre identité (copie recto-verso d'une pièce d'identité ou copie du livret de famille)</li>
+                        <li>2 photographies d'identité comportant votre nom-prénom-classe au dos</li>
+                        <li>Photocopie de la JDC</li>
+                        <li>L'assurance scolaire</li>
+                        <li>La notification de bourse CROUS</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Alertes -->
+            {% for message in app.flashes('success') %}
+                <div class="fr-alert fr-alert--success fr-mb-4w">
+                    <p>{{ message }}</p>
+                </div>
+            {% endfor %}
+            
+            {% for message in app.flashes('error') %}
+                <div class="fr-alert fr-alert--error fr-mb-4w">
+                    <p>{{ message }}</p>
+                </div>
+            {% endfor %}
+
+            <!-- Formulaire -->
+            {{ form_start(form, {'attr': {'class': 'fr-form', 'id': 'inscription-form', 'enctype': 'multipart/form-data'}}) }}
+            
+            <!-- Indicateur d'étapes -->
+            <div class="step-navigation">
+                <div class="step-indicator">
+                    <div class="step-item active" data-step="1">
+                        <div class="step-number">1</div>
+                        <div class="step-title">Identité</div>
+                    </div>
+                    <div class="step-item" data-step="2">
+                        <div class="step-number">2</div>
+                        <div class="step-title">Scolarité</div>
+                    </div>
+                    <div class="step-item" data-step="3">
+                        <div class="step-number">3</div>
+                        <div class="step-title">Historique</div>
+                    </div>
+                    <div class="step-item" data-step="4">
+                        <div class="step-number">4</div>
+                        <div class="step-title">Responsables</div>
+                    </div>
+                    <div class="step-item" data-step="5">
+                        <div class="step-number">5</div>
+                        <div class="step-title">Urgence</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- ÉTAPE 1: Identité de l'étudiant -->
+            <div class="form-step active" data-step="1">
+            <div class="fr-mb-6w">
+                <h2 class="fr-h3 fr-mb-3w fr-p-3w" style="border-left: 4px solid #000091;">Fiche de renseignements de l'étudiant</h2>
+                
+                <div class="fr-grid-row fr-grid-row--gutters">
+                    <div class="fr-col-12 fr-col-md-6">
+                        <div class="fr-input-group">
+                            {{ form_label(form.nom, 'Nom (en majuscule)', {'label_attr': {'class': 'fr-label'}}) }}
+                            {{ form_widget(form.nom) }}
+                            {{ form_errors(form.nom) }}
+                        </div>
+                    </div>
+                    <div class="fr-col-12 fr-col-md-6">
+                        <div class="fr-input-group">
+                            {{ form_label(form.prenom, null, {'label_attr': {'class': 'fr-label'}}) }}
+                            {{ form_widget(form.prenom) }}
+                            {{ form_errors(form.prenom) }}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="fr-input-group">
+                    {{ form_label(form.numeroSecuriteSociale, null, {'label_attr': {'class': 'fr-label'}}) }}
+                    {{ form_widget(form.numeroSecuriteSociale) }}
+                    {{ form_errors(form.numeroSecuriteSociale) }}
+                </div>
+
+                <div class="fr-grid-row fr-grid-row--gutters">
+                    <div class="fr-col-12 fr-col-md-4">
+                        <div class="fr-input-group">
+                            {{ form_label(form.dateNaissance, null, {'label_attr': {'class': 'fr-label'}}) }}
+                            {{ form_widget(form.dateNaissance) }}
+                            {{ form_errors(form.dateNaissance) }}
+                        </div>
+                    </div>
+                    <div class="fr-col-12 fr-col-md-4">
+                        <fieldset class="fr-fieldset">
+                            <legend class="fr-fieldset__legend fr-text--regular">
+                                {{ form_label(form.sexe) }}
+                            </legend>
+                            {{ form_widget(form.sexe) }}
+                            {{ form_errors(form.sexe) }}
+                        </fieldset>
+                    </div>
+                    <div class="fr-col-12 fr-col-md-4">
+                        <div class="fr-input-group">
+                            {{ form_label(form.nationalite, null, {'label_attr': {'class': 'fr-label'}}) }}
+                            {{ form_widget(form.nationalite) }}
+                            {{ form_errors(form.nationalite) }}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="fr-input-group">
+                    {{ form_label(form.adresse_rue, null, {'label_attr': {'class': 'fr-label'}}) }}
+                    {{ form_widget(form.adresse_rue) }}
+                    {{ form_errors(form.adresse_rue) }}
+                </div>
+
+                <div class="fr-grid-row fr-grid-row--gutters">
+                    <div class="fr-col-12 fr-col-md-5">
+                        <div class="fr-input-group">
+                            {{ form_label(form.adresse_departement, null, {'label_attr': {'class': 'fr-label'}}) }}
+                            {{ form_widget(form.adresse_departement) }}
+                            {{ form_errors(form.adresse_departement) }}
+                        </div>
+                    </div>
+                    <div class="fr-col-12 fr-col-md-5">
+                        <div class="fr-input-group">
+                            {{ form_label(form.adresse_commune, null, {'label_attr': {'class': 'fr-label'}}) }}
+                            {{ form_widget(form.adresse_commune) }}
+                            {{ form_errors(form.adresse_commune) }}
+                        </div>
+                    </div>
+                    <div class="fr-col-12 fr-col-md-2">
+                        <div class="fr-input-group">
+                            {{ form_label(form.adresse_codepostal, 'CP', {'label_attr': {'class': 'fr-label'}}) }}
+                            {{ form_widget(form.adresse_codepostal) }}
+                            {{ form_errors(form.adresse_codepostal) }}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="fr-grid-row fr-grid-row--gutters">
+                    <div class="fr-col-12 fr-col-md-6">
+                        <div class="fr-input-group">
+                            {{ form_label(form.tel, null, {'label_attr': {'class': 'fr-label'}}) }}
+                            {{ form_widget(form.tel) }}
+                            {{ form_errors(form.tel) }}
+                        </div>
+                    </div>
+                    <div class="fr-col-12 fr-col-md-6">
+                        <div class="fr-input-group">
+                            {{ form_label(form.email, null, {'label_attr': {'class': 'fr-label'}}) }}
+                            {{ form_widget(form.email) }}
+                            {{ form_errors(form.email) }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="fr-btns-group fr-btns-group--right fr-btns-group--inline">
+                <button type="submit" name="save_draft" value="1" class="fr-btn fr-btn--tertiary" title="Sauvegarder et reprendre plus tard">
+                    Sauvegarder et continuer plus tard
+                </button>
+                <button type="button" class="fr-btn btn-prev">Précédent</button>
+            </div>
+        </div>            <!-- ÉTAPE 2: Scolarité de l'année d'inscription -->
+            <div class="form-step" data-step="2">
+            <div class="fr-mb-6w fr-p-3w" style="border: 1px solid #ddd; border-radius: 0.25rem;">
+                <h2 class="fr-h4 fr-mb-3w">Scolarité de l'année d'inscription</h2>
+                
+                <fieldset class="fr-fieldset fr-mb-3w">
+                    <legend class="fr-fieldset__legend fr-fieldset__legend--regular">
+                        {{ form_label(form.redoublement) }}
+                    </legend>
+                    <div class="fr-fieldset__content">
+                        {{ form_widget(form.redoublement, {'attr': {'class': 'fr-fieldset__element'}}) }}
+                        {{ form_errors(form.redoublement) }}
+                    </div>
+                </fieldset>
+
+                <fieldset class="fr-fieldset fr-mb-3w">
+                    <legend class="fr-fieldset__legend fr-fieldset__legend--regular">
+                        {{ form_label(form.regimeSco) }}
+                    </legend>
+                    <div class="fr-fieldset__content">
+                        {{ form_widget(form.regimeSco, {'attr': {'class': 'fr-fieldset__element'}}) }}
+                        {{ form_errors(form.regimeSco) }}
+                    </div>
+                </fieldset>
+
+                <h3 class="fr-h5 fr-mb-2w">Transport</h3>
+                <fieldset class="fr-fieldset fr-mb-3w">
+                    <legend class="fr-fieldset__legend fr-fieldset__legend--regular">
+                        {{ form_label(form.transport_ligne) }}
+                    </legend>
+                    <div class="fr-fieldset__content">
+                        {{ form_widget(form.transport_ligne, {'attr': {'class': 'fr-fieldset__element'}}) }}
+                        {{ form_errors(form.transport_ligne) }}
+                    </div>
+                </fieldset>
+
+                <div class="fr-input-group">
+                    {{ form_label(form.transport_immatriculation, null, {'label_attr': {'class': 'fr-label'}}) }}
+                    {{ form_widget(form.transport_immatriculation) }}
+                    {{ form_errors(form.transport_immatriculation) }}
+                </div>
+
+                <div class="fr-grid-row fr-grid-row--gutters fr-mt-3w">
+                    <div class="fr-col-12 fr-col-md-6">
+                        <div class="fr-input-group">
+                            {{ form_label(form.classe, null, {'label_attr': {'class': 'fr-label'}}) }}
+                            {{ form_widget(form.classe) }}
+                            {{ form_errors(form.classe) }}
+                        </div>
+                    </div>
+                    <div class="fr-col-12 fr-col-md-6">
+                        <div class="fr-select-group">
+                            {{ form_label(form.specialite, null, {'label_attr': {'class': 'fr-label'}}) }}
+                            {{ form_widget(form.specialite) }}
+                            {{ form_errors(form.specialite) }}
+                        </div>
+                    </div>
+                </div>
+
+                <h3 class="fr-h5 fr-mb-2w fr-mt-3w">Langues</h3>
+                <div class="fr-grid-row fr-grid-row--gutters">
+                    <div class="fr-col-12 fr-col-md-6">
+                        <div class="fr-select-group">
+                            {{ form_label(form.lv1, null, {'label_attr': {'class': 'fr-label'}}) }}
+                            {{ form_widget(form.lv1) }}
+                            {{ form_errors(form.lv1) }}
+                        </div>
+                    </div>
+                    <div class="fr-col-12 fr-col-md-6">
+                        <div class="fr-select-group">
+                            {{ form_label(form.lv2, null, {'label_attr': {'class': 'fr-label'}}) }}
+                            {{ form_widget(form.lv2) }}
+                            {{ form_errors(form.lv2) }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="fr-btns-group fr-btns-group--center fr-btns-group--inline fr-mt-4w">
+                <button type="submit" name="save_draft" value="1" class="fr-btn fr-btn--tertiary" title="Sauvegarder et reprendre plus tard">
+                    Sauvegarder et continuer plus tard
+                </button>
+                <button type="button" class="fr-btn fr-btn--secondary btn-prev">Précédent</button>
+                <button type="button" class="fr-btn btn-next">Suivant</button>
+            </div>
+            </div>
+
+            <!-- ÉTAPE 3: Scolarité des 2 années antérieures -->
+            <div class="form-step" data-step="3">
+            <div class="fr-mb-6w fr-p-3w" style="border: 1px solid #ddd; border-radius: 0.25rem;">
+                <h2 class="fr-h4 fr-mb-3w">Scolarité des 2 années antérieures</h2>
+                
+                <div class="fr-table fr-table--bordered">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Année Scolaire</th>
+                                <th>Classe</th>
+                                <th>Établissement</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>2023/2024</td>
+                                <td>{{ form_widget(form.scolarite_classe1, {'attr': {'class': 'fr-input'}}) }}</td>
+                                <td>{{ form_widget(form.scolarite_etablissement1, {'attr': {'class': 'fr-input'}}) }}</td>
+                            </tr>
+                            <tr>
+                                <td>2024/2025</td>
+                                <td>{{ form_widget(form.scolarite_classe2, {'attr': {'class': 'fr-input'}}) }}</td>
+                                <td>{{ form_widget(form.scolarite_etablissement2, {'attr': {'class': 'fr-input'}}) }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                {{ form_widget(form.scolarite_annee1, {'attr': {'style': 'display:none'}}) }}
+                {{ form_widget(form.scolarite_annee2, {'attr': {'style': 'display:none'}}) }}
+
+                <div class="fr-input-group fr-mt-3w">
+                    <div class="fr-select-group">
+                        {{ form_label(form.diplome, null, {'label_attr': {'class': 'fr-label'}}) }}
+                        {{ form_widget(form.diplome) }}
+                        {{ form_errors(form.diplome) }}
+                    </div>
+                </div>
+
+                <div class="fr-input-group" id="diplome-autre-field" style="display: none;">
+                    {{ form_label(form.diplome_autre, null, {'label_attr': {'class': 'fr-label'}}) }}
+                    {{ form_widget(form.diplome_autre) }}
+                    {{ form_errors(form.diplome_autre) }}
+                </div>
+            </div>
+            
+            <div class="fr-btns-group fr-btns-group--center fr-btns-group--inline">
+                <button type="submit" name="save_draft" value="1" class="fr-btn fr-btn--tertiary" title="Sauvegarder et reprendre plus tard">
+                    Sauvegarder et continuer plus tard
+                </button>
+                <button type="button" class="fr-btn fr-btn--secondary btn-prev">Précédent</button>
+                <button type="button" class="fr-btn btn-next">Suivant</button>
+            </div>
+            </div>
+            </div>
+
+            <!-- ÉTAPE 4: Responsables légaux -->
+            <div class="form-step" data-step="4">
+            <div class="fr-mb-6w">
+                <h2 class="fr-h3 fr-mb-3w fr-p-3w" style="border-left: 4px solid #000091;">Identité des responsables</h2>
+                
+                <h3 class="fr-h5 fr-mb-2w">1) Responsables légaux</h3>
+                <p class="fr-text--sm fr-mb-3w"><strong>Responsable 1</strong></p>
+                
+                <div class="fr-grid-row fr-grid-row--gutters">
+                    <div class="fr-col-12 fr-col-md-4">
+                        <div class="fr-select-group">
+                            {{ form_label(form.responsable1_lien, null, {'label_attr': {'class': 'fr-label'}}) }}
+                            {{ form_widget(form.responsable1_lien) }}
+                            {{ form_errors(form.responsable1_lien) }}
+                        </div>
+                    </div>
+                    <div class="fr-col-12 fr-col-md-4">
+                        <div class="fr-input-group">
+                            {{ form_label(form.responsable1_nom, null, {'label_attr': {'class': 'fr-label'}}) }}
+                            {{ form_widget(form.responsable1_nom) }}
+                            {{ form_errors(form.responsable1_nom) }}
+                        </div>
+                    </div>
+                    <div class="fr-col-12 fr-col-md-4">
+                        <div class="fr-input-group">
+                            {{ form_label(form.responsable1_prenom, null, {'label_attr': {'class': 'fr-label'}}) }}
+                            {{ form_widget(form.responsable1_prenom) }}
+                            {{ form_errors(form.responsable1_prenom) }}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="fr-input-group">
+                    {{ form_label(form.responsable1_adresse, null, {'label_attr': {'class': 'fr-label'}}) }}
+                    {{ form_widget(form.responsable1_adresse) }}
+                    {{ form_errors(form.responsable1_adresse) }}
+                </div>
+
+                <div class="fr-input-group">
+                    {{ form_label(form.responsable1_commune, null, {'label_attr': {'class': 'fr-label'}}) }}
+                    {{ form_widget(form.responsable1_commune) }}
+                    {{ form_errors(form.responsable1_commune) }}
+                </div>
+
+                <div class="fr-input-group">
+                    {{ form_label(form.responsable1_email, null, {'label_attr': {'class': 'fr-label'}}) }}
+                    {{ form_widget(form.responsable1_email) }}
+                    {{ form_errors(form.responsable1_email) }}
+                </div>
+
+                <div class="fr-grid-row fr-grid-row--gutters">
+                    <div class="fr-col-12 fr-col-md-4">
+                        <div class="fr-input-group">
+                            {{ form_label(form.responsable1_telDomicile, null, {'label_attr': {'class': 'fr-label'}}) }}
+                            {{ form_widget(form.responsable1_telDomicile) }}
+                            {{ form_errors(form.responsable1_telDomicile) }}
+                        </div>
+                    </div>
+                    <div class="fr-col-12 fr-col-md-4">
+                        <div class="fr-input-group">
+                            {{ form_label(form.responsable1_telPro, null, {'label_attr': {'class': 'fr-label'}}) }}
+                            {{ form_widget(form.responsable1_telPro) }}
+                            {{ form_errors(form.responsable1_telPro) }}
+                        </div>
+                    </div>
+                    <div class="fr-col-12 fr-col-md-4">
+                        <div class="fr-input-group">
+                            {{ form_label(form.responsable1_telMobile, null, {'label_attr': {'class': 'fr-label'}}) }}
+                            {{ form_widget(form.responsable1_telMobile) }}
+                            {{ form_errors(form.responsable1_telMobile) }}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="fr-checkbox-group">
+                    {{ form_widget(form.responsable1_sms) }}
+                    {{ form_label(form.responsable1_sms) }}
+                </div>
+
+                <div class="fr-input-group">
+                    {{ form_label(form.responsable1_profession, null, {'label_attr': {'class': 'fr-label'}}) }}
+                    {{ form_widget(form.responsable1_profession) }}
+                    {{ form_errors(form.responsable1_profession) }}
+                </div>
+
+                <hr class="fr-my-4w">
+
+                <p class="fr-text--sm fr-mb-3w"><strong>Responsable 2</strong> (optionnel)</p>
+                
+                <div class="fr-grid-row fr-grid-row--gutters">
+                    <div class="fr-col-12 fr-col-md-4">
+                        <div class="fr-select-group">
+                            {{ form_label(form.responsable2_lien, null, {'label_attr': {'class': 'fr-label'}}) }}
+                            {{ form_widget(form.responsable2_lien) }}
+                            {{ form_errors(form.responsable2_lien) }}
+                        </div>
+                    </div>
+                    <div class="fr-col-12 fr-col-md-4">
+                        <div class="fr-input-group">
+                            {{ form_label(form.responsable2_nom, null, {'label_attr': {'class': 'fr-label'}}) }}
+                            {{ form_widget(form.responsable2_nom) }}
+                            {{ form_errors(form.responsable2_nom) }}
+                        </div>
+                    </div>
+                    <div class="fr-col-12 fr-col-md-4">
+                        <div class="fr-input-group">
+                            {{ form_label(form.responsable2_prenom, null, {'label_attr': {'class': 'fr-label'}}) }}
+                            {{ form_widget(form.responsable2_prenom) }}
+                            {{ form_errors(form.responsable2_prenom) }}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="fr-grid-row fr-grid-row--gutters">
+                    <div class="fr-col-12 fr-col-md-6">
+                        <div class="fr-input-group">
+                            {{ form_label(form.responsable2_email, null, {'label_attr': {'class': 'fr-label'}}) }}
+                            {{ form_widget(form.responsable2_email) }}
+                            {{ form_errors(form.responsable2_email) }}
+                        </div>
+                    </div>
+                    <div class="fr-col-12 fr-col-md-6">
+                        <div class="fr-input-group">
+                            {{ form_label(form.responsable2_telMobile, null, {'label_attr': {'class': 'fr-label'}}) }}
+                            {{ form_widget(form.responsable2_telMobile) }}
+                            {{ form_errors(form.responsable2_telMobile) }}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="fr-input-group">
+                    {{ form_label(form.responsable2_profession, null, {'label_attr': {'class': 'fr-label'}}) }}
+                    {{ form_widget(form.responsable2_profession) }}
+                    {{ form_errors(form.responsable2_profession) }}
+                </div>
+
+                <hr class="fr-my-4w">
+
+                <h3 class="fr-h5 fr-mb-2w">2) Si l'étudiant est indépendant ou majeur responsable</h3>
+                
+                <div class="fr-checkbox-group fr-mb-3w">
+                    {{ form_widget(form.etudiant_independant) }}
+                    {{ form_label(form.etudiant_independant) }}
+                </div>
+
+                <div class="fr-input-group">
+                    {{ form_label(form.etudiant_adresse, null, {'label_attr': {'class': 'fr-label'}}) }}
+                    {{ form_widget(form.etudiant_adresse) }}
+                    {{ form_errors(form.etudiant_adresse) }}
+                </div>
+
+                <div class="fr-input-group">
+                    {{ form_label(form.etudiant_commune, null, {'label_attr': {'class': 'fr-label'}}) }}
+                    {{ form_widget(form.etudiant_commune) }}
+                    {{ form_errors(form.etudiant_commune) }}
+                </div>
+
+                <div class="fr-grid-row fr-grid-row--gutters">
+                    <div class="fr-col-12 fr-col-md-6">
+                        <div class="fr-input-group">
+                            {{ form_label(form.etudiant_telDomicile, null, {'label_attr': {'class': 'fr-label'}}) }}
+                            {{ form_widget(form.etudiant_telDomicile) }}
+                            {{ form_errors(form.etudiant_telDomicile) }}
+                        </div>
+                    </div>
+                    <div class="fr-col-12 fr-col-md-6">
+                        <div class="fr-input-group">
+                            {{ form_label(form.etudiant_telMobile2, null, {'label_attr': {'class': 'fr-label'}}) }}
+                            {{ form_widget(form.etudiant_telMobile2) }}
+                            {{ form_errors(form.etudiant_telMobile2) }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="fr-btns-group fr-btns-group--right fr-btns-group--inline">
+                <button type="submit" name="save_draft" value="1" class="fr-btn fr-btn--tertiary" title="Sauvegarder et reprendre plus tard">
+                    Sauvegarder et continuer plus tard
+                </button>
+                <button type="button" class="fr-btn fr-btn--secondary btn-prev">Précédent</button>
+                <button type="button" class="fr-btn btn-next">Suivant</button>
+            </div>
+            </div>
+            </div>
+
+            <!-- ÉTAPE 5: Fiche d'urgence -->
+            <div class="form-step" data-step="5">
+            <div class="fr-mb-6w fr-p-3w" style="border-left: 4px solid #ce0500; border: 1px solid #ce0500; border-radius: 0.25rem;">
+                <h2 class="fr-h3 fr-mb-3w">Fiche d'urgence (Service Infirmier)</h2>
+                
+                <div class="fr-input-group">
+                    {{ form_label(form.urgence_centreSecuSociale, null, {'label_attr': {'class': 'fr-label'}}) }}
+                    {{ form_widget(form.urgence_centreSecuSociale) }}
+                    {{ form_errors(form.urgence_centreSecuSociale) }}
+                </div>
+
+                <div class="fr-input-group">
+                    {{ form_label(form.urgence_assuranceScolaire, null, {'label_attr': {'class': 'fr-label'}}) }}
+                    {{ form_widget(form.urgence_assuranceScolaire) }}
+                    {{ form_errors(form.urgence_assuranceScolaire) }}
+                </div>
+
+                <h3 class="fr-h5 fr-mb-2w fr-mt-3w">Numéros de téléphone en cas d'urgence</h3>
+                <p class="fr-text--xs fr-mb-2w">En cas d'accident, l'établissement s'efforcera de prévenir la famille par les moyens les plus rapides.</p>
+                
+                <div class="fr-grid-row fr-grid-row--gutters">
+                    <div class="fr-col-12 fr-col-md-6">
+                        <div class="fr-input-group">
+                            {{ form_label(form.urgence_telTravailPere, null, {'label_attr': {'class': 'fr-label'}}) }}
+                            {{ form_widget(form.urgence_telTravailPere) }}
+                            {{ form_errors(form.urgence_telTravailPere) }}
+                        </div>
+                    </div>
+                    <div class="fr-col-12 fr-col-md-6">
+                        <div class="fr-input-group">
+                            {{ form_label(form.urgence_postePere, null, {'label_attr': {'class': 'fr-label'}}) }}
+                            {{ form_widget(form.urgence_postePere) }}
+                            {{ form_errors(form.urgence_postePere) }}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="fr-grid-row fr-grid-row--gutters">
+                    <div class="fr-col-12 fr-col-md-6">
+                        <div class="fr-input-group">
+                            {{ form_label(form.urgence_telTravailMere, null, {'label_attr': {'class': 'fr-label'}}) }}
+                            {{ form_widget(form.urgence_telTravailMere) }}
+                            {{ form_errors(form.urgence_telTravailMere) }}
+                        </div>
+                    </div>
+                    <div class="fr-col-12 fr-col-md-6">
+                        <div class="fr-input-group">
+                            {{ form_label(form.urgence_posteMere, null, {'label_attr': {'class': 'fr-label'}}) }}
+                            {{ form_widget(form.urgence_posteMere) }}
+                            {{ form_errors(form.urgence_posteMere) }}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="fr-input-group">
+                    {{ form_label(form.urgence_dateVaccin, null, {'label_attr': {'class': 'fr-label'}}) }}
+                    {{ form_widget(form.urgence_dateVaccin) }}
+                    {{ form_errors(form.urgence_dateVaccin) }}
+                </div>
+
+                <div class="fr-input-group">
+                    {{ form_label(form.urgence_observations, null, {'label_attr': {'class': 'fr-label'}}) }}
+                    {{ form_widget(form.urgence_observations) }}
+                    {{ form_errors(form.urgence_observations) }}
+                </div>
+
+                <div class="fr-input-group">
+                    {{ form_label(form.urgence_medecinTraitant, null, {'label_attr': {'class': 'fr-label'}}) }}
+                    {{ form_widget(form.urgence_medecinTraitant) }}
+                    {{ form_errors(form.urgence_medecinTraitant) }}
+                </div>
+
+                <h3 class="fr-h5 fr-mb-2w fr-mt-4w">Documents à joindre</h3>
+                <p class="fr-text--sm fr-mb-3w">Veuillez télécharger les documents suivants (formats acceptés : PDF, JPG, PNG)</p>
+
+                <div class="fr-upload-group">
+                    {{ form_label(form.doc_carteVitale, null, {'label_attr': {'class': 'fr-label'}}) }}
+                    {{ form_widget(form.doc_carteVitale) }}
+                    {{ form_errors(form.doc_carteVitale) }}
+                </div>
+
+                <div class="fr-upload-group">
+                    {{ form_label(form.doc_diplome, null, {'label_attr': {'class': 'fr-label'}}) }}
+                    {{ form_widget(form.doc_diplome) }}
+                    {{ form_errors(form.doc_diplome) }}
+                </div>
+
+                <div class="fr-upload-group">
+                    {{ form_label(form.doc_photoIdentite, null, {'label_attr': {'class': 'fr-label'}}) }}
+                    {{ form_widget(form.doc_photoIdentite) }}
+                    {{ form_errors(form.doc_photoIdentite) }}
+                </div>
+
+                <div class="fr-upload-group">
+                    {{ form_label(form.doc_certificatScolarite, null, {'label_attr': {'class': 'fr-label'}}) }}
+                    {{ form_widget(form.doc_certificatScolarite) }}
+                    {{ form_errors(form.doc_certificatScolarite) }}
+                </div>
+
+                <div class="fr-alert fr-alert--warning fr-mt-3w">
+                    <p class="fr-text--sm">Document non confidentiel, à remettre par les familles à chaque début d'année scolaire. Si vous souhaitez transmettre des informations confidentielles, vous pouvez le faire sous enveloppe fermée à l'attention du médecin ou de l'infirmière scolaire de l'établissement.</p>
+                </div>
+
+                <!-- Acceptation RGPD -->
+                <div class="fr-form-group fr-mt-4w">
+                    <div class="fr-checkbox-group">
+                        {{ form_widget(form.acceptation_rgpd, {'attr': {'class': 'fr-checkbox'}}) }}
+                        <label class="fr-label" for="{{ form.acceptation_rgpd.vars.id }}">
+                            {{ form.acceptation_rgpd.vars.label|raw }}
+                            <a href="{{ path('app_cgu') }}" target="_blank" class="fr-link">Voir les CGU</a>
+                        </label>
+                        {{ form_errors(form.acceptation_rgpd) }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Boutons de soumission -->
+            <div class="fr-btns-group fr-btns-group--center fr-btns-group--inline">
+                <button type="submit" name="save_draft" value="1" class="fr-btn fr-btn--tertiary" title="Sauvegarder et reprendre plus tard">
+                    Sauvegarder et continuer plus tard
+                </button>
+                <button type="button" class="fr-btn fr-btn--secondary btn-prev">Précédent</button>
+                <button type="submit" class="fr-btn" onclick="console.log('Bouton enregistrer cliqué')">Enregistrer mon inscription</button>
+            </div>
+            </div>
+
+            {{ form_end(form) }}
+        </div>
+    </div>
+</div>
+{% endblock %}

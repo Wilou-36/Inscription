@@ -1,0 +1,52 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Créer un compte{% endblock %}
+
+{% block body %}
+<div class="fr-container fr-py-6w">
+    <div class="fr-grid-row fr-grid-row--center">
+        <div class="fr-col-12 fr-col-md-8 fr-col-lg-6">
+            <h1 id="page-title" class="fr-h1 fr-mb-4w">Créer un compte</h1>
+
+            <div class="fr-alert fr-alert--info fr-mb-4w" role="status">
+                <p>Créez votre compte pour accéder au formulaire d'inscription et suivre votre dossier.</p>
+            </div>
+
+            {{ form_start(registrationForm, {'attr': {'aria-labelledby': 'page-title', 'novalidate': 'novalidate'}}) }}
+                <div class="fr-input-group fr-mb-4w">
+                    {{ form_label(registrationForm.identifiant, null, {'label_attr': {'class': 'fr-label'}}) }}
+                    {{ form_widget(registrationForm.identifiant) }}
+                    {{ form_errors(registrationForm.identifiant) }}
+                </div>
+
+                <div class="fr-input-group fr-mb-4w">
+                    {{ form_label(registrationForm.plainPassword.first, null, {'label_attr': {'class': 'fr-label'}}) }}
+                    {{ form_widget(registrationForm.plainPassword.first) }}
+                    {{ form_errors(registrationForm.plainPassword.first) }}
+                </div>
+
+                <div class="fr-input-group fr-mb-4w">
+                    {{ form_label(registrationForm.plainPassword.second, null, {'label_attr': {'class': 'fr-label'}}) }}
+                    {{ form_widget(registrationForm.plainPassword.second) }}
+                    {{ form_errors(registrationForm.plainPassword.second) }}
+                </div>
+
+                <div class="fr-btns-group">
+                    <button class="fr-btn" type="submit" title="Valider et créer mon compte">
+                        Créer mon compte
+                    </button>
+                    <a class="fr-btn fr-btn--secondary" href="{{ path('app_login') }}" title="Accéder au formulaire de connexion">
+                        J'ai déjà un compte
+                    </a>
+                </div>
+            {{ form_end(registrationForm) }}
+
+            <nav class="fr-mt-4w" aria-label="Navigation secondaire">
+                <a href="{{ path('app_home') }}" class="fr-link" title="Retourner à la page d'accueil">
+                    ← Retour à l'accueil
+                </a>
+            </nav>
+        </div>
+    </div>
+</div>
+{% endblock %}

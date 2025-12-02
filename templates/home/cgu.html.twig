@@ -1,0 +1,152 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Conditions Générales d'Utilisation{% endblock %}
+
+{% block body %}
+<div class="fr-container fr-py-6w">
+    <div class="fr-grid-row fr-grid-row--center">
+        <div class="fr-col-12 fr-col-md-10">
+            <h1 class="fr-h1">Conditions Générales d'Utilisation</h1>
+            <p class="fr-text--lead">Lycée Fulbert - Plateforme d'inscription BTS</p>
+            
+            <div class="fr-callout fr-mb-3w">
+                <p class="fr-callout__text">
+                    Dernière mise à jour : {{ "now"|date("d/m/Y") }}
+                </p>
+            </div>
+
+            <h2 class="fr-h2 fr-mt-6w">1. Objet</h2>
+            <p>
+                La présente plateforme d'inscription en ligne permet aux futurs étudiants de déposer leur dossier de candidature 
+                pour une inscription en BTS (Brevet de Technicien Supérieur) au Lycée Fulbert.
+            </p>
+            <p>
+                En utilisant cette plateforme, vous acceptez les présentes conditions générales d'utilisation.
+            </p>
+
+            <h2 class="fr-h2 fr-mt-6w">2. Inscription et compte utilisateur</h2>
+            <h3 class="fr-h3">2.1 Création de compte</h3>
+            <p>
+                Pour accéder au formulaire d'inscription, vous devez créer un compte utilisateur avec une adresse email valide 
+                et un mot de passe sécurisé.
+            </p>
+            
+            <h3 class="fr-h3">2.2 Responsabilité</h3>
+            <p>
+                Vous êtes responsable de maintenir la confidentialité de vos identifiants de connexion. Toute action effectuée 
+                depuis votre compte sera considérée comme ayant été effectuée par vous.
+            </p>
+
+            <h2 class="fr-h2 fr-mt-6w">3. Dépôt du dossier d'inscription</h2>
+            <h3 class="fr-h3">3.1 Informations requises</h3>
+            <p>
+                Vous devez fournir des informations exactes et complètes lors de votre inscription. Tout dossier comportant 
+                des informations fausses ou incomplètes pourra être refusé.
+            </p>
+            
+            <h3 class="fr-h3">3.2 Documents à fournir</h3>
+            <p>Les documents suivants sont obligatoires :</p>
+            <ul class="fr-ul">
+                <li>Carte vitale (copie)</li>
+                <li>Diplôme ou relevé de notes du baccalauréat</li>
+                <li>Photo d'identité récente</li>
+                <li>Certificat de scolarité</li>
+            </ul>
+            <p>
+                Les documents doivent être au format PDF, JPG ou PNG et ne pas dépasser 5 Mo par fichier.
+            </p>
+
+            <h3 class="fr-h3">3.3 Délais</h3>
+            <p>
+                Les inscriptions sont ouvertes selon le calendrier défini par l'établissement. Tout dossier déposé en dehors 
+                de la période d'inscription ne sera pas pris en compte.
+            </p>
+
+            <h2 class="fr-h2 fr-mt-6w">4. Traitement des dossiers</h2>
+            <h3 class="fr-h3">4.1 Validation</h3>
+            <p>
+                Votre dossier sera examiné par les services administratifs du lycée. Vous recevrez une notification par email 
+                dès que votre dossier aura été validé ou refusé.
+            </p>
+            
+            <h3 class="fr-h3">4.2 Délais de traitement</h3>
+            <p>
+                Le lycée s'efforce de traiter les dossiers dans les meilleurs délais, généralement sous 15 jours ouvrés. 
+                Toutefois, ce délai peut varier selon le nombre de candidatures reçues.
+            </p>
+
+            <h2 class="fr-h2 fr-mt-6w">5. Protection des données personnelles</h2>
+            <p>
+                Conformément au Règlement Général sur la Protection des Données (RGPD) et à la loi Informatique et Libertés, 
+                vous disposez d'un droit d'accès, de rectification, de suppression et d'opposition aux données vous concernant.
+            </p>
+            
+            <h3 class="fr-h3">5.1 Données collectées</h3>
+            <p>Les informations collectées sont :</p>
+            <ul class="fr-ul">
+                <li>Informations personnelles (nom, prénom, date de naissance, etc.)</li>
+                <li>Coordonnées (adresse, téléphone, email)</li>
+                <li>Informations scolaires (classe, diplômes, etc.)</li>
+                <li>Documents justificatifs</li>
+                <li>Informations des responsables légaux</li>
+            </ul>
+
+            <h3 class="fr-h3">5.2 Finalité du traitement</h3>
+            <p>
+                Ces données sont collectées uniquement dans le cadre de l'inscription au Lycée Fulbert et ne seront pas 
+                utilisées à d'autres fins ni transmises à des tiers, sauf obligation légale.
+            </p>
+
+            <h3 class="fr-h3">5.3 Durée de conservation</h3>
+            <p>
+                Les données sont conservées pendant la durée nécessaire au traitement de votre inscription, puis archivées 
+                conformément aux obligations légales de l'établissement.
+            </p>
+
+            <h3 class="fr-h3">5.4 Exercice de vos droits</h3>
+            <p>
+                Pour exercer vos droits, vous pouvez contacter le Délégué à la Protection des Données (DPO) du lycée :
+            </p>
+            <ul class="fr-ul">
+                <li>Par email : dpo@lycee-fulbert.fr</li>
+                <li>Par courrier : Lycée Fulbert - Service DPO - [Adresse complète]</li>
+            </ul>
+
+            <h2 class="fr-h2 fr-mt-6w">6. Sécurité</h2>
+            <p>
+                Le Lycée Fulbert met en œuvre toutes les mesures techniques et organisationnelles nécessaires pour assurer 
+                la sécurité de vos données personnelles et empêcher leur altération, leur perte ou l'accès par des tiers non autorisés.
+            </p>
+
+            <h2 class="fr-h2 fr-mt-6w">7. Cookies</h2>
+            <p>
+                Cette plateforme utilise des cookies strictement nécessaires au fonctionnement du site (cookies de session). 
+                Aucun cookie publicitaire ou de traçage n'est utilisé.
+            </p>
+
+            <h2 class="fr-h2 fr-mt-6w">8. Modification des CGU</h2>
+            <p>
+                Le Lycée Fulbert se réserve le droit de modifier à tout moment les présentes conditions générales d'utilisation. 
+                Les modifications seront effectives dès leur mise en ligne.
+            </p>
+
+            <h2 class="fr-h2 fr-mt-6w">9. Contact</h2>
+            <p>
+                Pour toute question concernant ces conditions d'utilisation ou votre inscription, vous pouvez contacter :
+            </p>
+            <ul class="fr-ul">
+                <li>Email : secretariat@lycee-fulbert.fr</li>
+                <li>Téléphone : XX XX XX XX XX</li>
+                <li>Adresse : Lycée Fulbert - [Adresse complète]</li>
+            </ul>
+
+            <div class="fr-mt-6w">
+                <a href="{{ path('app_home') }}" class="fr-btn fr-btn--secondary">
+                    <span class="fr-icon-arrow-left-line fr-icon--sm" aria-hidden="true"></span>
+                    Retour à l'accueil
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

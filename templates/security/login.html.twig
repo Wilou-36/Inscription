@@ -1,0 +1,83 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Connexion{% endblock %}
+
+{% block body %}
+<div class="fr-container fr-py-6w">
+    <div class="fr-grid-row fr-grid-row--center">
+        <div class="fr-col-12 fr-col-md-8 fr-col-lg-6">
+            <h1 id="page-title" class="fr-h1 fr-mb-4w">Connexion</h1>
+
+            {% if error %}
+                <div class="fr-alert fr-alert--error fr-mb-4w" role="alert" id="login-error">
+                    <p>{{ error.messageKey|trans(error.messageData, 'security') }}</p>
+                </div>
+            {% endif %}
+
+            {% for message in app.flashes('success') %}
+                <div class="fr-alert fr-alert--success fr-mb-4w" role="status">
+                    <p>{{ message }}</p>
+                </div>
+            {% endfor %}
+
+            <form method="post" action="{{ path('app_login') }}" aria-labelledby="page-title" novalidate>
+                <div class="fr-input-group fr-mb-4w">
+                    <label class="fr-label" for="identifiant">
+                        Identifiant
+                        <span class="fr-hint-text">Saisissez l'identifiant choisi lors de la création de votre compte</span>
+                    </label>
+                    <input 
+                        class="fr-input" 
+                        type="text" 
+                        id="identifiant" 
+                        name="_username" 
+                        value="{{ last_username }}" 
+                        required 
+                        autofocus
+                        autocomplete="username"
+                        {% if error %}aria-describedby="login-error"{% endif %}
+                        aria-required="true"
+                    >
+                </div>
+
+                <div class="fr-input-group fr-mb-4w">
+                    <label class="fr-label" for="password">
+                        Mot de passe
+                    </label>
+                    <input 
+                        class="fr-input" 
+                        type="password" 
+                        id="password" 
+                        name="_password" 
+                        required
+                        autocomplete="current-password"
+                        {% if error %}aria-describedby="login-error"{% endif %}
+                        aria-required="true"
+                    >
+                </div>
+
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+                <div class="fr-btns-group">
+                    <button class="fr-btn" type="submit" title="Se connecter à mon espace personnel">
+                        Se connecter
+                    </button>
+                    <a class="fr-btn fr-btn--secondary" href="{{ path('app_register') }}" title="Accéder au formulaire de création de compte">
+                        Créer un compte
+                    </a>
+                </div>
+            </form>
+
+            <nav class="fr-mt-4w" aria-label="Navigation secondaire">
+                <a href="{{ path('app_home') }}" class="fr-link" title="Retourner à la page d'accueil">
+                    ← Retour à l'accueil
+                </a>
+                <span class="fr-mx-2w">|</span>
+                <a href="{{ path('app_register_admin') }}" class="fr-link" title="Créer un compte administrateur">
+                    Créer un compte administrateur
+                </a>
+            </nav>
+        </div>
+    </div>
+</div>
+{% endblock %}

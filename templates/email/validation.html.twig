@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background-color: #18753C;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        .content {
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        .footer {
+            padding: 20px;
+            text-align: center;
+            font-size: 12px;
+            color: #666;
+        }
+        .success-icon {
+            font-size: 48px;
+            text-align: center;
+            margin: 20px 0;
+        }
+        .button {
+            display: inline-block;
+            padding: 12px 24px;
+            background-color: #18753C;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Lycée Fulbert</h1>
+            <p>Validation de votre inscription</p>
+        </div>
+        
+        <div class="content">
+            <div class="success-icon">✅</div>
+            
+            <h2>Félicitations {{ etudiant.prenom }} {{ etudiant.nom }} !</h2>
+            
+            <p>Votre dossier d'inscription en <strong>BTS {{ dossier.scolarite.bts }}</strong> a été <strong style="color: #18753C;">validé</strong> par nos services.</p>
+            
+            <p><strong>Numéro de dossier :</strong> {{ dossier.id }}</p>
+            
+            {% if message %}
+            <h3>Message de l'administration :</h3>
+            <p style="background-color: white; padding: 15px; border-left: 4px solid #18753C;">
+                {{ message|nl2br }}
+            </p>
+            {% endif %}
+            
+            <h3>Prochaines étapes :</h3>
+            <ul>
+                <li>Vous recevrez prochainement votre convocation pour la rentrée</li>
+                <li>La liste des fournitures scolaires vous sera communiquée</li>
+                <li>Les modalités de paiement seront précisées ultérieurement</li>
+            </ul>
+            
+            <p>Si vous avez des questions, n'hésitez pas à contacter le secrétariat du lycée.</p>
+            
+            <p style="text-align: center;">
+                <a href="{{ absolute_url(path('app_suivi')) }}" class="button">Voir mon dossier</a>
+            </p>
+        </div>
+        
+        <div class="footer">
+            <p>Lycée Fulbert - Inscription BTS</p>
+            <p>Nous vous souhaitons une excellente année scolaire !</p>
+        </div>
+    </div>
+</body>
+</html>

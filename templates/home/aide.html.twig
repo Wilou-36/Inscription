@@ -1,0 +1,197 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Besoin d'aide - Inscription BTS{% endblock %}
+
+{% block body %}
+<div class="fr-container fr-py-6w">
+    <div class="fr-grid-row fr-grid-row--center">
+        <div class="fr-col-12 fr-col-md-10">
+            <!-- Breadcrumb -->
+            <nav role="navigation" class="fr-breadcrumb" aria-label="vous êtes ici :">
+                <button class="fr-breadcrumb__button" aria-expanded="false" aria-controls="breadcrumb-1">Voir le fil d'Ariane</button>
+                <div class="fr-collapse" id="breadcrumb-1">
+                    <ol class="fr-breadcrumb__list">
+                        <li>
+                            <a class="fr-breadcrumb__link" href="/">Accueil</a>
+                        </li>
+                        <li>
+                            <a class="fr-breadcrumb__link" aria-current="page">Besoin d'aide</a>
+                        </li>
+                    </ol>
+                </div>
+            </nav>
+
+            <!-- Titre -->
+            <div class="fr-mb-4w">
+                <h1 class="fr-h1">Besoin d'aide ?</h1>
+                <p class="fr-text--lead">Consultez notre FAQ ou contactez-nous</p>
+            </div>
+
+            <!-- FAQ -->
+            <div class="fr-mb-6w">
+                <h2 class="fr-h3 fr-mb-3w">Questions fréquentes</h2>
+                
+                <div class="fr-accordions-group">
+                    <section class="fr-accordion">
+                        <h3 class="fr-accordion__title">
+                            <button class="fr-accordion__btn" aria-expanded="false" aria-controls="faq-1">
+                                Comment m'inscrire en BTS ?
+                            </button>
+                        </h3>
+                        <div class="fr-collapse" id="faq-1">
+                            <p>Pour vous inscrire en BTS, vous devez :</p>
+                            <ol>
+                                <li>Remplir le formulaire d'inscription en ligne</li>
+                                <li>Rassembler les documents requis</li>
+                                <li>Déposer votre dossier complet au secrétariat avant le 26 août 2025</li>
+                            </ol>
+                        </div>
+                    </section>
+
+                    <section class="fr-accordion">
+                        <h3 class="fr-accordion__title">
+                            <button class="fr-accordion__btn" aria-expanded="false" aria-controls="faq-2">
+                                Quels sont les critères d'admission ?
+                            </button>
+                        </h3>
+                        <div class="fr-collapse" id="faq-2">
+                            <p>L'admission en BTS est ouverte aux titulaires du baccalauréat (général, technologique ou professionnel). La sélection se fait sur dossier via Parcoursup.</p>
+                        </div>
+                    </section>
+
+                    <section class="fr-accordion">
+                        <h3 class="fr-accordion__title">
+                            <button class="fr-accordion__btn" aria-expanded="false" aria-controls="faq-3">
+                                Puis-je modifier mon inscription après validation ?
+                            </button>
+                        </h3>
+                        <div class="fr-collapse" id="faq-3">
+                            <p>Oui, vous pouvez modifier certaines informations en contactant le secrétariat. Cependant, le changement de spécialité n'est possible que dans les 15 jours suivant la rentrée, et sous réserve de places disponibles.</p>
+                        </div>
+                    </section>
+
+                    <section class="fr-accordion">
+                        <h3 class="fr-accordion__title">
+                            <button class="fr-accordion__btn" aria-expanded="false" aria-controls="faq-4">
+                                Comment obtenir une bourse CROUS ?
+                            </button>
+                        </h3>
+                        <div class="fr-collapse" id="faq-4">
+                            <p>Les demandes de bourse se font sur le site du CROUS entre janvier et mai de l'année précédant la rentrée. Pour plus d'informations : <a href="https://www.messervices.etudiant.gouv.fr" target="_blank" rel="noopener">messervices.etudiant.gouv.fr</a></p>
+                        </div>
+                    </section>
+
+                    <section class="fr-accordion">
+                        <h3 class="fr-accordion__title">
+                            <button class="fr-accordion__btn" aria-expanded="false" aria-controls="faq-5">
+                                Quels sont les horaires du secrétariat ?
+                            </button>
+                        </h3>
+                        <div class="fr-collapse" id="faq-5">
+                            <p><strong>Lycée Fulbert - Secrétariat de direction</strong><br>
+                            Du lundi au vendredi : 8h00 - 12h00 et 13h30 - 17h00<br>
+                            Fermé les jours fériés et pendant les vacances scolaires (sauf période d'inscription)</p>
+                        </div>
+                    </section>
+
+                    <section class="fr-accordion">
+                        <h3 class="fr-accordion__title">
+                            <button class="fr-accordion__btn" aria-expanded="false" aria-controls="faq-6">
+                                Que faire si je n'ai pas tous les documents requis ?
+                            </button>
+                        </h3>
+                        <div class="fr-collapse" id="faq-6">
+                            <p>Contactez immédiatement le secrétariat pour expliquer votre situation. Un délai supplémentaire peut être accordé au cas par cas, mais il est important de prévenir avant la date limite.</p>
+                        </div>
+                    </section>
+
+                    <section class="fr-accordion">
+                        <h3 class="fr-accordion__title">
+                            <button class="fr-accordion__btn" aria-expanded="false" aria-controls="faq-7">
+                                Y a-t-il une restauration scolaire ?
+                            </button>
+                        </h3>
+                        <div class="fr-collapse" id="faq-7">
+                            <p>Oui, le lycée dispose d'un self-service. Le tarif pour les demi-pensionnaires à l'unité est de 4,55€ par repas. Vous pouvez choisir le régime "Externe" ou "Demi-pensionnaire" lors de votre inscription.</p>
+                        </div>
+                    </section>
+
+                    <section class="fr-accordion">
+                        <h3 class="fr-accordion__title">
+                            <button class="fr-accordion__btn" aria-expanded="false" aria-controls="faq-8">
+                                Comment accéder au lycée en transports en commun ?
+                            </button>
+                        </h3>
+                        <div class="fr-collapse" id="faq-8">
+                            <p>Le lycée est desservi par :</p>
+                            <ul>
+                                <li><strong>Filibus</strong> : plusieurs lignes de bus urbains</li>
+                                <li><strong>SNCF</strong> : gare à proximité</li>
+                            </ul>
+                            <p>Pensez à indiquer votre mode de transport dans le formulaire d'inscription pour faciliter l'organisation.</p>
+                        </div>
+                    </section>
+                </div>
+            </div>
+
+            <!-- Contact -->
+            <div class="fr-mb-4w">
+                <h2 class="fr-h3 fr-mb-3w">Nous contacter</h2>
+                
+                <div class="fr-grid-row fr-grid-row--gutters">
+                    <div class="fr-col-12 fr-col-md-6">
+                        <div class="fr-card">
+                            <div class="fr-card__body">
+                                <div class="fr-card__content">
+                                    <h3 class="fr-card__title">Par téléphone</h3>
+                                    <p class="fr-card__desc">
+                                        <strong>Secrétariat :</strong> 02 XX XX XX XX<br>
+                                        Du lundi au vendredi<br>
+                                        8h00 - 12h00 et 13h30 - 17h00
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="fr-col-12 fr-col-md-6">
+                        <div class="fr-card">
+                            <div class="fr-card__body">
+                                <div class="fr-card__content">
+                                    <h3 class="fr-card__title">Par email</h3>
+                                    <p class="fr-card__desc">
+                                        <strong>Email :</strong> <a href="mailto:secretariat@lycee-fulbert.fr">secretariat@lycee-fulbert.fr</a><br>
+                                        Réponse sous 48h ouvrées
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="fr-col-12">
+                        <div class="fr-card">
+                            <div class="fr-card__body">
+                                <div class="fr-card__content">
+                                    <h3 class="fr-card__title">Sur place</h3>
+                                    <p class="fr-card__desc">
+                                        <strong>Lycée Fulbert</strong><br>
+                                        1 Rue Fulbert<br>
+                                        28000 Chartres<br><br>
+                                        Accueil ouvert du lundi au vendredi<br>
+                                        8h00 - 12h00 et 13h30 - 17h00
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bouton retour -->
+            <div class="fr-btns-group fr-btns-group--center">
+                <a class="fr-btn" href="/">Retour à l'accueil</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

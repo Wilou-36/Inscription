@@ -1,0 +1,157 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Suivi de mon dossier - Inscription BTS{% endblock %}
+
+{% block body %}
+<div class="fr-container fr-py-6w">
+    <div class="fr-grid-row fr-grid-row--center">
+        <div class="fr-col-12 fr-col-lg-10">
+            <nav role="navigation" class="fr-breadcrumb" aria-label="vous êtes ici :">
+                <button class="fr-breadcrumb__button" aria-expanded="false" aria-controls="breadcrumb-1">Voir le fil d'Ariane</button>
+                <div class="fr-collapse" id="breadcrumb-1">
+                    <ol class="fr-breadcrumb__list">
+                        <li>
+                            <a class="fr-breadcrumb__link" href="{{ path('app_home') }}">Accueil</a>
+                        </li>
+                        <li>
+                            <a class="fr-breadcrumb__link" aria-current="page">Suivi de mon dossier</a>
+                        </li>
+                    </ol>
+                </div>
+            </nav>
+
+            <h1 class="fr-h1 fr-mb-4w">Suivi de mon dossier</h1>
+
+            {% if etudiant %}
+                <!-- Message de l'administration -->
+                {% if etudiant.statut == 'valide' %}
+                    <div class="fr-alert fr-alert--success fr-mb-4w" role="status">
+                        <h3 class="fr-alert__title">Dossier validé</h3>
+                        <p>Votre dossier d'inscription a été validé. Vous recevrez prochainement un email de confirmation avec les informations complémentaires.</p>
+                        {% if etudiant.messageAdmin %}
+                            <p class="fr-mt-2w"><strong>Message de l'administration :</strong><br>{{ etudiant.messageAdmin }}</p>
+                        {% endif %}
+                    </div>
+                {% elseif etudiant.statut == 'refuse' %}
+                    <div class="fr-alert fr-alert--error fr-mb-4w" role="status">
+                        <h3 class="fr-alert__title">Dossier refusé</h3>
+                        {% if etudiant.messageAdmin %}
+                            <p>{{ etudiant.messageAdmin }}</p>
+                        {% else %}
+                            <p>Votre dossier d'inscription a été refusé. Pour plus d'informations, veuillez contacter l'administration.</p>
+                        {% endif %}
+                    </div>
+                {% else %}
+                    <div class="fr-alert fr-alert--info fr-mb-4w" role="status">
+                        <h3 class="fr-alert__title">Dossier en attente de validation</h3>
+                        <p>Votre dossier d'inscription a bien été enregistré et est en cours de traitement par l'administration. Vous serez informé par email dès qu'une décision sera prise.</p>
+                        {% if etudiant.messageAdmin %}
+                            <p class="fr-mt-2w"><strong>Message de l'administration :</strong><br>{{ etudiant.messageAdmin }}</p>
+                        {% endif %}
+                    </div>
+                {% endif %}
+
+                <!-- Récapitulatif du dossier -->
+                <div class="fr-callout fr-mb-4w">
+                    <h2 class="fr-callout__title">Récapitulatif de votre dossier</h2>
+                    <p class="fr-callout__text">
+                        <strong>Statut :</strong> 
+                        {% if etudiant.statut == 'valide' %}
+                            <span class="fr-badge fr-badge--success fr-badge--sm">Validé</span>
+                        {% elseif etudiant.statut == 'refuse' %}
+                            <span class="fr-badge fr-badge--error fr-badge--sm">Refusé</span>
+                        {% else %}
+                            <span class="fr-badge fr-badge--info fr-badge--sm">En attente</span>
+                        {% endif %}
+                    </p>
+                </div>
+
+                <!-- Informations personnelles -->
+                <h2 class="fr-h3 fr-mt-6w">Vos informations</h2>
+                <div class="fr-table fr-mb-4w">
+                    <table>
+                        <tbody>
+                            <tr>
+                                <th scope="row">Nom et prénom</th>
+                                <td>{{ etudiant.nom }} {{ etudiant.prenom }}</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Date de naissance</th>
+                                <td>{{ etudiant.dateNaissance ? etudiant.dateNaissance|date('d/m/Y') : 'Non renseignée' }}</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Email</th>
+                                <td>{{ etudiant.email ?? 'Non renseigné' }}</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Téléphone</th>
+                                <td>{{ etudiant.tel ?? 'Non renseigné' }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Formation demandée -->
+                {% if etudiant.dossSco %}
+                    <h2 class="fr-h3 fr-mt-6w">Formation demandée</h2>
+                    <div class="fr-table fr-mb-4w">
+                        <table>
+                            <tbody>
+                                <tr>
+                                    <th scope="row">Spécialité</th>
+                                    <td>{{ etudiant.dossSco.specialite ?? 'Non renseignée' }}</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Régime scolaire</th>
+                                    <td>{{ etudiant.dossSco.regimeSco ?? 'Non renseigné' }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                {% endif %}
+
+                <!-- Prochaines étapes -->
+                <div class="fr-notice fr-notice--info fr-mt-6w">
+                    <div class="fr-container">
+                        <div class="fr-notice__body">
+                            <p class="fr-notice__title">Prochaines étapes</p>
+                            <p class="fr-notice__desc">
+                                {% if etudiant.statut == 'valide' %}
+                                    Vous recevrez prochainement par email toutes les informations nécessaires pour finaliser votre inscription (date de rentrée, liste du matériel, etc.).
+                                {% elseif etudiant.statut == 'refuse' %}
+                                    Pour plus d'informations concernant le refus de votre dossier, vous pouvez contacter l'administration de l'établissement.
+                                {% else %}
+                                    Votre dossier est en cours d'examen. L'administration vous contactera par email dès qu'une décision sera prise.
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Actions disponibles -->
+                <div class="fr-mt-4w">
+                    <a href="{{ path('app_home') }}" class="fr-btn fr-btn--secondary">
+                        Retour à l'accueil
+                    </a>
+                </div>
+
+            {% else %}
+                <!-- Aucun dossier trouvé -->
+                <div class="fr-alert fr-alert--info" role="status">
+                    <h2 class="fr-alert__title">Aucun dossier trouvé</h2>
+                    <p>Vous n'avez pas encore soumis de dossier d'inscription.</p>
+                    <a href="/inscription" class="fr-btn fr-btn--sm fr-mt-2w">
+                        Commencer mon inscription
+                    </a>
+                </div>
+
+                <div class="fr-mt-4w">
+                    <a href="{{ path('app_home') }}" class="fr-btn fr-btn--secondary">
+                        Retour à l'accueil
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

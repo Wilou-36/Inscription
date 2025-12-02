@@ -1,0 +1,140 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Documents requis - Inscription BTS{% endblock %}
+
+{% block body %}
+<div class="fr-container fr-py-6w">
+    <div class="fr-grid-row fr-grid-row--center">
+        <div class="fr-col-12 fr-col-md-10">
+            <!-- Breadcrumb -->
+            <nav role="navigation" class="fr-breadcrumb" aria-label="vous êtes ici :">
+                <button class="fr-breadcrumb__button" aria-expanded="false" aria-controls="breadcrumb-1">Voir le fil d'Ariane</button>
+                <div class="fr-collapse" id="breadcrumb-1">
+                    <ol class="fr-breadcrumb__list">
+                        <li>
+                            <a class="fr-breadcrumb__link" href="/">Accueil</a>
+                        </li>
+                        <li>
+                            <a class="fr-breadcrumb__link" aria-current="page">Documents requis</a>
+                        </li>
+                    </ol>
+                </div>
+            </nav>
+
+            <!-- Titre -->
+            <div class="fr-mb-4w">
+                <h1 class="fr-h1">Documents requis</h1>
+                <p class="fr-text--lead">Liste des pièces justificatives nécessaires pour votre inscription</p>
+            </div>
+
+            <!-- Alerte importante -->
+            <div class="fr-alert fr-alert--warning fr-mb-4w">
+                <h3 class="fr-alert__title">Attention</h3>
+                <p>Tous les documents doivent être fournis au <strong>secrétariat de direction du Lycée Fulbert avant le 26 août 2025</strong>.</p>
+            </div>
+
+            <!-- Liste des documents -->
+            <div class="fr-mb-4w">
+                <h2 class="fr-h3 fr-mb-3w">Documents à fournir</h2>
+                
+                <div class="fr-table fr-table--bordered">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Document</th>
+                                <th>Obligatoire</th>
+                                <th>Format accepté</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Attestation de réussite au baccalauréat (photocopie du relevé de notes)</td>
+                                <td><span class="fr-badge fr-badge--error">Obligatoire</span></td>
+                                <td>Photocopie</td>
+                            </tr>
+                            <tr>
+                                <td>Copie de la carte vitale</td>
+                                <td><span class="fr-badge fr-badge--error">Obligatoire</span></td>
+                                <td>Photocopie recto-verso</td>
+                            </tr>
+                            <tr>
+                                <td>Attestation d'identité (carte d'identité ou livret de famille)</td>
+                                <td><span class="fr-badge fr-badge--error">Obligatoire</span></td>
+                                <td>Photocopie recto-verso</td>
+                            </tr>
+                            <tr>
+                                <td>2 photographies d'identité</td>
+                                <td><span class="fr-badge fr-badge--error">Obligatoire</span></td>
+                                <td>Format standard avec nom-prénom-classe au dos</td>
+                            </tr>
+                            <tr>
+                                <td>Photocopie de la JDC (Journée Défense et Citoyenneté)</td>
+                                <td><span class="fr-badge fr-badge--error">Obligatoire</span></td>
+                                <td>Photocopie</td>
+                            </tr>
+                            <tr>
+                                <td>Attestation d'assurance scolaire</td>
+                                <td><span class="fr-badge fr-badge--error">Obligatoire</span></td>
+                                <td>Original ou copie</td>
+                            </tr>
+                            <tr>
+                                <td>Notification de bourse CROUS</td>
+                                <td><span class="fr-badge fr-badge--info">Si applicable</span></td>
+                                <td>Original ou copie</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Informations complémentaires -->
+            <div class="fr-mb-4w">
+                <h2 class="fr-h3 fr-mb-3w">Informations importantes</h2>
+                
+                <div class="fr-accordions-group">
+                    <section class="fr-accordion">
+                        <h3 class="fr-accordion__title">
+                            <button class="fr-accordion__btn" aria-expanded="false" aria-controls="accordion-1">
+                                Que faire si je n'ai pas tous les documents ?
+                            </button>
+                        </h3>
+                        <div class="fr-collapse" id="accordion-1">
+                            <p>Si vous ne pouvez pas fournir tous les documents à la date limite, contactez immédiatement le secrétariat de direction pour expliquer votre situation. Des arrangements peuvent être faits au cas par cas.</p>
+                        </div>
+                    </section>
+
+                    <section class="fr-accordion">
+                        <h3 class="fr-accordion__title">
+                            <button class="fr-accordion__btn" aria-expanded="false" aria-controls="accordion-2">
+                                Format des documents
+                            </button>
+                        </h3>
+                        <div class="fr-collapse" id="accordion-2">
+                            <p>Les photocopies doivent être lisibles et en bon état. Pour les documents recto-verso, assurez-vous que les deux faces sont copiées.</p>
+                        </div>
+                    </section>
+
+                    <section class="fr-accordion">
+                        <h3 class="fr-accordion__title">
+                            <button class="fr-accordion__btn" aria-expanded="false" aria-controls="accordion-3">
+                                Où déposer les documents ?
+                            </button>
+                        </h3>
+                        <div class="fr-collapse" id="accordion-3">
+                            <p><strong>Lycée Fulbert - Secrétariat de direction</strong><br>
+                            Du lundi au vendredi : 8h00 - 12h00 et 13h30 - 17h00<br>
+                            Fermé les jours fériés</p>
+                        </div>
+                    </section>
+                </div>
+            </div>
+
+            <!-- Bouton retour -->
+            <div class="fr-btns-group fr-btns-group--center">
+                <a class="fr-btn" href="/">Retour à l'accueil</a>
+                <a class="fr-btn fr-btn--secondary" href="/inscription">Commencer mon inscription</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
