@@ -1,7 +1,0 @@
-framework:
-    mailer:
-        dsn: '%env(MAILER_DSN)%'
-        envelope:
-            sender: 'noreply@lycee-fulbert.fr'
-        headers:
-            from: 'Lycée Fulbert <noreply@lycee-fulbert.fr>'
